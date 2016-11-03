@@ -1,0 +1,352 @@
+const utils = require('./utils');
+const array = require('./array');
+const object = require('./object');
+
+const patchTypes = {
+  add: 'add',
+  remove: 'remove',
+  update: 'update',
+  moveUp: 'moveUp',
+  moveDown: 'moveDown',
+  moveTo: 'moveTo',
+  exchange: 'exchange',
+  spreadArray: 'spreadArray',
+  spread2dArrayCol: 'spread2dArrayCol',
+  spread2dArrayRow: 'spread2dArrayRow'
+};
+
+const createPatch = function (type, args) {
+  args = Array.prototype.slice.call(args);
+  return utils.copy({
+    type: type,
+    args: args
+  });
+};
+
+/**
+ * create patch operations
+ * */
+
+const patchMethods = {
+  createAdd: function (path, value, key) {
+    return createPatch(patchTypes.add, arguments);
+  },
+  createRemove: function (path) {
+    return createPatch(patchTypes.remove, arguments);
+  },
+  createUpdate: function (path, value, forceUpdate) {
+    return createPatch(patchTypes.update, arguments);
+  },
+  createMoveUp: function (path) {
+    return createPatch(patchTypes.moveUp, arguments);
+  },
+  createMoveDown: function (path) {
+    return createPatch(patchTypes.moveDown, arguments);
+  },
+  createMoveTo: function (from, to, key) {
+    return createPatch(patchTypes.moveTo, arguments);
+  },
+  createExchange: function (from, to) {
+    return createPatch(patchTypes.exchange, arguments);
+  },
+  createSpreadArray: function (path, begin, infilling) {
+    return createPatch(patchTypes.spreadArray, arguments);
+  },
+  createSpread2dArrayRow: function (path, begin, rows) {
+    return createPatch(patchTypes.spread2dArrayRow, arguments);
+  },
+  createSpread2dArrayCol: function (path, begin, cols) {
+    return createPatch(patchTypes.spread2dArrayCol, arguments);
+  }
+};
+
+function JSONDataStore(options) {
+  options = options || {};
+  var store = options.store, copyStore = options.copyStore !== false;
+  this.store = copyStore ? utils.copy(store) : store;
+  // 'do' about attributes
+  this.patches = [];
+  this.relativePatches = [];
+  this.backPatches = [];
+  this.currentPath = [];
+  this.isDoing = false;
+}
+
+JSONDataStore.prototype = {
+  _getRef: function (path) {
+    var ref = this.store, i = 0, len = path.length;
+    for(; i < len; i ++){
+      ref = ref[path[i]];
+    }
+    return ref;
+  },
+  _detectPath: function (path) {
+    var detected = [], ref = this.store, i = 0, len = path.length, key, keyType, refType;
+    for(; i < len; i ++){
+      key = path[i];
+      keyType = utils.type(key);
+      refType = utils.type(ref);
+      if(refType === 'object'){
+        if(object.hasOwnProperty.call(key, '__value')){
+          var objKey = object.getObjectKeyByValue(ref, key.__value);
+          if(objKey){
+            ref = ref[objKey];
+            detected.push(objKey);
+          }else{
+            return [];
+          }
+        }else if(object.hasOwnProperty.call(ref, key)){
+          ref = ref[key];
+          detected.push(key);
+        }else{
+          return [];
+        }
+      }else if(refType === 'array'){
+        if(object.hasOwnProperty.call(key, '__value')){
+          var index = array.getArrayIndexByValue(ref, key.__value);
+          if(index > -1){
+            ref = ref[index];
+            detected.push(index);
+          }else{
+            return [];
+          }
+        }else if(object.hasOwnProperty.call(ref, key)){
+          ref = ref[key];
+          detected.push(key);
+        }else{
+          return [];
+        }
+      }
+    }
+    return detected;
+  },
+  _formatPath: function (path, detect) {
+    var pathType = utils.type(path);
+    if(pathType === 'undefined' || pathType === 'null'){
+      path = [];
+    }else if(pathType !== 'array'){
+      path = [path];
+    }
+    if(detect !== false){
+      var detected = this._detectPath(path);
+      if(detected.length === path.length){
+        return detected;
+      }
+      return null;
+    }
+    return path;
+  },
+  _moveArrayItem: function (path, moveUp) {
+    var fullPath = this._getFullPath(path);
+    if(!fullPath || fullPath.length < 1) return this;
+    var itemIndex = fullPath.pop(),
+      arr = this._getRef(fullPath);
+    if(utils.type(arr) !== 'array') return this;
+    var method = moveUp === true ? 'createMoveUp' : 'createMoveDown',
+      reverseMethod = method === 'createMoveUp' ? 'createMoveDown' : 'createMoveUp';
+    if(this.isDoing){
+      this.patches.push(patchMethods[method](fullPath.concat(itemIndex)));
+      this.relativePatches.push(patchMethods[method](this._getRelativePath(fullPath.concat(itemIndex))));
+      if((moveUp === true && itemIndex > 0)
+      || (moveUp !== true && itemIndex < arr.length - 1)){
+        this.backPatches.unshift(patchMethods[reverseMethod](fullPath.concat(moveUp === true ? itemIndex - 1 : itemIndex + 1)));
+      }
+    }
+    if(moveUp === true){
+      array.moveArrayItemUp(arr, itemIndex);
+    }else {
+      array.moveArrayItemDown(arr, itemIndex);
+    }
+    return this;
+  },
+  _getFullPath: function (path) {
+    var currentPath = this._formatPath(this.currentPath, false),
+      fullPath = currentPath.concat(this._formatPath(path, false));
+    return this._formatPath(fullPath);
+  },
+  _getRelativePath: function (fullPath) {
+    return fullPath.slice(this.currentPath.length);
+  },
+  goTo: function (path, addUp) {
+    if(!this.isDoing){
+      throw new Error('You are using store.goTo outside store.do!');
+    }
+    if(addUp === true){
+      this.currentPath = this.currentPath.concat(this._formatPath(path));
+    }else {
+      this.currentPath = this._formatPath(path);
+    }
+    return this;
+  },
+  do: function (callback) {
+    var result = {};
+    this.isDoing = true;
+    callback(this);
+    // compose result
+    result.patches = this.patches;
+    result.relativePatches = this.relativePatches;
+    result.backPatches = this.backPatches;
+    result.store = this;
+    // reset 'do' about attributes
+    this.patches = [];
+    this.relativePatches = [];
+    this.backPatches = [];
+    this.currentPath = [];
+    this.isDoing = false;
+    return result;
+  },
+  add: function (path, value, key) {
+    var ref, refType;
+    path = this._getFullPath(path);
+    if(!path || !utils.isReferenceType(ref = this._getRef(path))
+      || ((refType = utils.type(ref)) === 'object' && !utils.isCommonKeyType(key))){
+      return this;
+    }
+    if(this.isDoing){
+      this.patches.push(patchMethods.createAdd(path, value, key));
+      this.relativePatches.push(patchMethods.createAdd(this._getRelativePath(path), value, key));
+      if(refType === 'object'){
+        this.backPatches.unshift(patchMethods.createRemove(path.concat(key)));
+      }else{
+        this.backPatches.unshift(patchMethods.createUpdate(path, this.get(path), true));
+      }
+    }
+    if (refType === 'object') {
+      ref[key] = value;
+    }else{
+      var index = array.parseArrayIndex(key);
+      if (index !== undefined) {
+        ref.splice(index, 0, value);
+      } else {
+        ref.push(value);
+      }
+    }
+    return this;
+  },
+  remove: function (path) {
+    if(!(path = this._getFullPath(path))) return this;
+    if(this.isDoing){
+      this.patches.push(patchMethods.createRemove(path));
+      this.relativePatches.push(patchMethods.createRemove(this._getRelativePath(path)));
+      this.backPatches.unshift(patchMethods.createUpdate(path, this.get(path), true));
+    }
+    if(path.length < 1){
+      this.store = undefined;
+      return this;
+    }
+    var lastKey = path.pop(), ref = this._getRef(path), refType = utils.type(ref);
+    if (refType === 'array') {
+      ref.splice(lastKey, 1);
+    }else if (refType === 'object') {
+      delete ref[lastKey];
+    }
+    return this;
+  },
+  update: function (path, value, forceUpdate) {
+    path = this._formatPath(path, false);
+    var lastKey, fullPath = this._formatPath(path);
+    if(fullPath){
+      if(this.isDoing){
+        this.patches.push(patchMethods.createUpdate(fullPath, value));
+        this.relativePatches.push(patchMethods.createUpdate(this._getRelativePath(fullPath), value));
+        this.backPatches.unshift(patchMethods.createUpdate(fullPath, this.get(fullPath)));
+      }
+      lastKey = fullPath.pop();
+      if(lastKey !== undefined){
+        this._getRef(fullPath)[lastKey] = value;
+      }else{
+        this.store = value;
+      }
+      return this;
+    }else if(forceUpdate === true && path.length > 0){
+      lastKey = path.pop();
+      return this.add(path, value, lastKey);
+    }
+    return this;
+  },
+  moveUp: function (path) {
+    return this._moveArrayItem(path, true);
+  },
+  moveDown: function (path) {
+    return this._moveArrayItem(path);
+  },
+  moveTo: function (from, to, key) {
+    from = this._getFullPath(from);
+    to = this._getFullPath(to);
+    if(!from || !to || !utils.isReferenceType(this._getRef(to))) return this;
+    this.add(to, this._getRef(from), key);
+    this.remove(from);
+    return this;
+  },
+  exchange: function (from, to) {
+    from = this._formatPath(from);
+    to = this._formatPath(to);
+    if(from && to){
+      var fromRef = this._getRef(from),
+        toRef = this.get(to);
+      this.update(from, toRef);
+      this.update(to, fromRef);
+    }
+    return this;
+  },
+  spreadArray: function (path, begin, infilling) {
+    begin = begin || 0;
+    var ref;
+    if(!(path = this._formatPath(path)) || utils.type(ref = this._getRef(path)) !== 'array'
+    || !(utils.type(begin) === 'number')){
+      return this;
+    }
+    if(this.isDoing){
+      this.patches.push(patchMethods.createSpreadArray(path, begin, infilling));
+      this.relativePatches.push(patchMethods.createSpreadArray(this._getRelativePath(path), begin, infilling));
+      this.backPatches.unshift(patchMethods.createUpdate(path, this.get(path)));
+    }
+    array.spreadArray(ref, begin, infilling);
+    return this;
+  },
+  spread2dArrayRow: function (path, begin, rows) {
+    begin = begin || 0;
+    var ref;
+    if(!(path = this._formatPath(path)) || !array.is2dArray(ref = this._getRef(path))
+      || !(utils.type(begin) === 'number')){
+      return this;
+    }
+    if(this.isDoing){
+      this.patches.push(patchMethods.createSpread2dArrayRow(path, begin, rows));
+      this.relativePatches.push(patchMethods.createSpread2dArrayRow(this._getRelativePath(path), begin, rows));
+      this.backPatches.unshift(patchMethods.createUpdate(path, this.get(path)));
+    }
+    array.spread2dArrayRow(ref, begin, rows);
+    return this;
+  },
+  spread2dArrayCol: function (path, begin, cols) {
+    begin = begin || 0;
+    var ref;
+    if(!(path = this._formatPath(path)) || !array.is2dArray(ref = this._getRef(path))
+      || !(utils.type(begin) === 'number')){
+      return this;
+    }
+    if(this.isDoing){
+      this.patches.push(patchMethods.createSpread2dArrayCol(path, begin, cols));
+      this.relativePatches.push(patchMethods.createSpread2dArrayCol(this._getRelativePath(path), begin, cols));
+      this.backPatches.unshift(patchMethods.createUpdate(path, this.get(path)));
+    }
+    array.spread2dArrayCol(ref, begin, cols);
+    return this;
+  },
+  get: function (path, copy) {
+    if(path = this._formatPath(path)){
+      return copy === false ? this._getRef(path) : utils.copy(this._getRef(path));
+    }
+  },
+  patch: patchMethods,
+  applyPatch: function (patches) {
+    patches = utils.type(patches) === 'array' ? patches : [patches];
+    patches.forEach(function (patch) {
+      this[patch.type].apply(this, patch.args)
+    }.bind(this));
+    return this;
+  }
+};
+
+module.exports = JSONDataStore;
