@@ -1,5 +1,5 @@
 # jsonstore-js
-A JSON data store for processing JSON data expediently.
+A data store for processing javascript JSON data expediently.
 
 ## Installing
 Use via npm:
@@ -22,9 +22,9 @@ It uses `JSON.parse(JSON.stringify(data))` to copy data, there are some(not all)
 - `Undefined` type or `Function` type data contained in an object will be removed.
 - `Undefined` type or `Function` type data contained in an array will be replaced to `Null`.
 - `Date` type data will be converted to a date string.
-- `RegExp` type data will be converted to a empty object.
+- `RegExp` type data will be converted to an empty object.
 
-Although the store has much constraints to using all javascript data types, it is natural and safe to construct a store using data that comes from a http request whether in browser or server side nodejs.
+Although the store has some constraints to using all javascript data types, it is natural and safe to construct a store using data that comes from a http request whether in browser or server side nodejs.
 Further more, JSON is designed to be a lightweight data-interchange format, it's enough and concise to use JSON data types to represent a structured data.
 
 ### Examples
@@ -32,10 +32,10 @@ The store we are going to use in examples is:
 ```javascript
 var JSONStore = require('jsonstore-js');
 var storeData = {
-    name: 'A book',
-    chapters: [
-        {name: 'colors', content: ['red', 'green', 'blue']},
-        {name: 'fruits', content: ['apple', 'orange', 'lemon']}
+    name: 'A store',
+    books: [
+        {id: 'abc', name: 'colors', content: ['red', 'green', 'blue']},
+        {id: 'def', name: 'fruits', content: ['apple', 'orange', 'lemon']}
     ]
 };
 var store = new JSONStore({
@@ -48,23 +48,23 @@ var store = new JSONStore({
 console.log(store.get( 'foo' )); // output: undefined
 console.log(store.get( 'name' )); // output: 'A book'
 console.log(store.get( ['name'] )); // output: 'A book'
-console.log(store.get( ['chapters', 0, 'name'] )); // output: 'colors'
-console.log(store.get( ['chapters', {__value: {name: 'colors'}}, 'content', 0] )); // output: 'red'
-console.log(store.get( ['chapters', 0, 'content', {__value: 'red'}, 1] )); // output: 'green'
+console.log(store.get( ['books', 0, 'name'] )); // output: 'colors'
+console.log(store.get( ['books', {__value: {name: 'colors'}}, 'content', 0] )); // output: 'red'
+console.log(store.get( ['books', 0, 'content', {__value: 'red'}, 1] )); // output: 'green'
 ```
 
 #### Changing the store
 ```javascript
-store.add('chapters', 'chapter3')
-    .exchange(['chapters', 0], ['chapters', 1]);
+store.add('books', 'book3')
+    .exchange(['books', 0], ['books', 1]);
     
-console.log(store.get( 'chapters' ));
+console.log(store.get( 'books' ));
 /**
 * The output is:
-* chapters: [
-*   {name: 'fruits', content: ['apple', 'orange', 'lemon']},
-*   {name: 'colors', content: ['red', 'green', 'blue']},
-*   'chapter3'
+* [
+*   {id: 'def', name: 'fruits', content: ['apple', 'orange', 'lemon']},
+*   {id: 'abc', name: 'colors', content: ['red', 'green', 'blue']},
+*   'book3'
 * ]
 */
 ```
@@ -72,25 +72,60 @@ console.log(store.get( 'chapters' ));
 #### Changing the store and rollback
 ```javascript
 var results = store.do(functon(store){
-    store.goTo(['chapters', {__value: {name: 'fruits'}}])
+    store.goTo(['books', {__value: {name: 'fruits'}}])
         .remove(['content', 0])
         .update({__value: 'lemon'}, 'grape');
-    console.log(store.get(['chapters', 1]));
+    console.log(store.get(['books', 1]));
     /**
     * The output is:
-    * {name: 'fruits', content: ['orange', 'grape']}
+    * {id: 'def', name: 'fruits', content: ['orange', 'grape']}
     */
 });
 
 store.applyPatch(results.backPatches);
-console.log(store.get(['chapters', 1]));
+console.log(store.get(['books', 1]));
 /**
 * The output is:
-* {name: 'fruits', content: ['apple', 'orange', 'lemon']}
+* {id: 'def', name: 'fruits', content: ['apple', 'orange', 'lemon']}
 */
 ```
-#### Changing the store and server side data
+#### Changing the store and update corresponding server side data
+Suppose the books of the example store come from a server side table named **book**.
+When you update one book in store, You may want to make an ajax request to update the same book in database and rollback the store changes when the ajax request is failure.
+These can be done with **jsonstore-js** easily:
+```javascript
+var results = store.do(functon(store){
+    store.goTo(['books', {__value: {id: 'abc'}}])
+        .remove(['content', 0])
+        .update({__value: 'lemon'}, 'grape');
+    console.log(store.get(['books', 1]));
+    /**
+    * The output is:
+    * {id:'def', name: 'fruits', content: ['orange', 'grape']}
+    */
+});
 
+jQuery.ajax({
+    method: "PATCH",
+    url: "/books/abc",
+    data: results.relativePatches,
+    success: function() {
+      // do something
+    },
+    error: function(){
+      store.applyPatch(results.backPatches);
+    }
+  });
+
+// server side pseudo-codes
+var patches = request.body,
+    book = getBookById('abc'),
+    store = new JSONStore({store: book});
+    
+var newBook = store.applyPatch(patches).get();
+
+saveBookById('abc', newBook);
+```
 
 ## APIs
 
