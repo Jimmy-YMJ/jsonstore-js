@@ -46,8 +46,8 @@ var store = new JSONStore({
 #### Traverse store and get data:
 ```javascript
 console.log(store.get( 'foo' )); // output: undefined
-console.log(store.get( 'name' )); // output: 'A book'
-console.log(store.get( ['name'] )); // output: 'A book'
+console.log(store.get( 'name' )); // output: 'A store'
+console.log(store.get( ['name'] )); // output: 'A store'
 console.log(store.get( ['books', 0, 'name'] )); // output: 'colors'
 console.log(store.get( ['books', {__value: {name: 'colors'}}, 'content', 0] )); // output: 'red'
 console.log(store.get( ['books', 0, 'content', {__value: 'red'}, 1] )); // output: 'green'
