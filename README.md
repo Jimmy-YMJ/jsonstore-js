@@ -126,7 +126,14 @@ var newBook = store.applyPatch(patches).get();
 
 saveBookById('def', newBook);
 ```
-
+The `store.do` method executes and record store operations in it's callback param. The value returned by `store.do` is an object like:
+ ```
+ {
+    patches: [...], // the really patches on store
+    relativePatches: [...], // patches with paths relative to the path of 'store.goTo(path)'
+    backPatches: [...] // patches to rollback
+ }
+ ```
 ## APIs
 
 ### 
