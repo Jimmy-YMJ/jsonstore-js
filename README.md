@@ -136,7 +136,13 @@ The `store.do` method executes and record store operations in it's callback para
  ```
 ## APIs
 
-### 
+### JSONStore(options):
+
+| **Option** | **Description** | **type** | **default** |
+| --- | --- | --- | --- |
+| store | the data used to construct a store | any safe types | `undefined` |
+| copyStore | copy the **store** param | `Boolean` | `true` |
+
 
 ### Data processing methods:
 - [store.add](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/ADD.md)
