@@ -95,7 +95,7 @@ When you update one book in store, You may want to make an ajax request to updat
 These can be done with **jsonstore-js** easily:
 ```javascript
 var results = store.do(functon(store){
-    store.goTo(['books', {__value: {id: 'abc'}}])
+    store.goTo(['books', {__value: {id: 'def'}}])
         .remove(['content', 0])
         .update({__value: 'lemon'}, 'grape');
     console.log(store.get(['books', 1]));
@@ -107,7 +107,7 @@ var results = store.do(functon(store){
 
 jQuery.ajax({
     method: "PATCH",
-    url: "/books/abc",
+    url: "/books/def",
     data: results.relativePatches,
     success: function() {
       // do something
@@ -119,12 +119,12 @@ jQuery.ajax({
 
 // server side pseudo-codes
 var patches = request.body,
-    book = getBookById('abc'),
+    book = getBookById('def'),
     store = new JSONStore({store: book});
     
 var newBook = store.applyPatch(patches).get();
 
-saveBookById('abc', newBook);
+saveBookById('def', newBook);
 ```
 
 ## APIs
