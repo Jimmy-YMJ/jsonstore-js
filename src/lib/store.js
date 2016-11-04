@@ -186,7 +186,6 @@ JSONDataStore.prototype = {
     result.patches = this.patches;
     result.relativePatches = this.relativePatches;
     result.backPatches = this.backPatches;
-    result.store = this;
     // reset 'do' about attributes
     this.patches = [];
     this.relativePatches = [];
