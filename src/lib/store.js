@@ -172,7 +172,7 @@ JSONDataStore.prototype = {
       throw new Error('You are using store.goTo outside store.do!');
     }
     if(addUp === true){
-      this.currentPath = this.currentPath.concat(this._formatPath(path));
+      this.currentPath = this._formatPath(this.currentPath.concat(this._formatPath(path, false)));
     }else {
       this.currentPath = this._formatPath(path);
     }
@@ -289,12 +289,12 @@ JSONDataStore.prototype = {
     return this;
   },
   spreadArray: function (path, begin, infilling) {
-    begin = begin || 0;
     var ref;
-    if(!(path = this._formatPath(path)) || utils.type(ref = this._getRef(path)) !== 'array'
-    || !(utils.type(begin) === 'number')){
+    if(!(path = this._formatPath(path)) || utils.type(ref = this._getRef(path)) !== 'array'){
       return this;
     }
+    begin = begin || ref.length;
+    if(!(utils.type(begin) === 'number')) return this;
     if(this.isDoing){
       this.patches.push(patchMethods.createSpreadArray(path, begin, infilling));
       this.relativePatches.push(patchMethods.createSpreadArray(this._getRelativePath(path), begin, infilling));
@@ -304,12 +304,13 @@ JSONDataStore.prototype = {
     return this;
   },
   spread2dArrayRow: function (path, begin, rows) {
-    begin = begin || 0;
     var ref;
     if(!(path = this._formatPath(path)) || !array.is2dArray(ref = this._getRef(path))
       || !(utils.type(begin) === 'number')){
       return this;
     }
+    begin = begin || ref.length;
+    if(!(utils.type(begin) === 'number')) return this;
     if(this.isDoing){
       this.patches.push(patchMethods.createSpread2dArrayRow(path, begin, rows));
       this.relativePatches.push(patchMethods.createSpread2dArrayRow(this._getRelativePath(path), begin, rows));
@@ -319,12 +320,13 @@ JSONDataStore.prototype = {
     return this;
   },
   spread2dArrayCol: function (path, begin, cols) {
-    begin = begin || 0;
     var ref;
     if(!(path = this._formatPath(path)) || !array.is2dArray(ref = this._getRef(path))
       || !(utils.type(begin) === 'number')){
       return this;
     }
+    begin = begin || ref.length;
+    if(!(utils.type(begin) === 'number')) return this;
     if(this.isDoing){
       this.patches.push(patchMethods.createSpread2dArrayCol(path, begin, cols));
       this.relativePatches.push(patchMethods.createSpread2dArrayCol(this._getRelativePath(path), begin, cols));
