@@ -146,6 +146,9 @@ The `store.do` method executes and record store operations in it's callback para
 ### About the `path` param:
 Param `path` used by methods is composed of **pathItem**s, it can be an array of **pathItem**s or just one **pathItem**. The **pathItem** can be two types: **key** and **value**, a **key** is the key of object or array, a **value** is an object like `{__value: 'bar'}` or `{__value: {foo: 'bar'}}`.
 
+### Data getting methods:
+- [store.get(path, copy)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/GET.md)
+
 ### Data processing methods:
 - [store.add(path, value, key)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/ADD.md)
 - [store.remove(path)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/REMOVE.md)
@@ -157,6 +160,8 @@ Param `path` used by methods is composed of **pathItem**s, it can be an array of
 - [store.spreadArray(path, begin, infilling)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/SPREADARRAY.md)
 - [store.spread2dArrayRow(path, begin, rows)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/SPREAD2DARRAYROW.md)
 - [store.spread2dArrayCol(path, begin, cols)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/SPREAD2DARRAYCOL.md)
+
+All these methods return the sore itself.
 
 ### Operation flows managing methods:
 - [store.do(callback)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/DO.md)
