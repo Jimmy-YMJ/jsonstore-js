@@ -147,8 +147,8 @@ it('test store.exchange', () => {
 
 it('test store.spreadArray', () => {
   var storeOperation = function (store, inDoing) {
-    validateMethodResult(store.spreadArray('content', 1, ['something']), store, inDoing);
-    expect(store.get(['content', 1])).toBe('something');
+    validateMethodResult(store.spreadArray('content', undefined, ['something']), store, inDoing);
+    expect(store.get(['content', 2])).toBe('something');
   };
 
   storeOperation(createStore(), false);
