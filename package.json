@@ -1,7 +1,7 @@
 {
   "name": "jsonstore-js",
   "version": "1.0.0",
-  "description": "A JSON data store with manifold abilities of data processing",
+  "description": "A javascript JSON data store with manifold abilities of data processing",
   "main": "store.js",
   "scripts": {
     "build": "gulp",
