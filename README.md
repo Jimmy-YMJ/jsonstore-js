@@ -34,8 +34,8 @@ var JSONStore = require('jsonstore-js');
 var storeData = {
     name: 'A store',
     books: [
-        {id: 'abc', name: 'colors', content: ['red', 'green', 'blue']},
-        {id: 'def', name: 'fruits', content: ['apple', 'orange', 'lemon']}
+        {id: 'book1', name: 'colors', content: ['red', 'green', 'blue']},
+        {id: 'book2', name: 'fruits', content: ['apple', 'orange', 'lemon']}
     ]
 };
 var store = new JSONStore({
@@ -62,8 +62,8 @@ console.log(store.get( 'books' ));
 /**
 * The output is:
 * [
-*   {id: 'def', name: 'fruits', content: ['apple', 'orange', 'lemon']},
-*   {id: 'abc', name: 'colors', content: ['red', 'green', 'blue']},
+*   {id: 'book2', name: 'fruits', content: ['apple', 'orange', 'lemon']},
+*   {id: 'book1', name: 'colors', content: ['red', 'green', 'blue']},
 *   'book3'
 * ]
 */
@@ -78,7 +78,7 @@ var results = store.do(functon(store){
     console.log(store.get(['books', 1]));
     /**
     * The output is:
-    * {id: 'def', name: 'fruits', content: ['orange', 'grape']}
+    * {id: 'book2', name: 'fruits', content: ['orange', 'grape']}
     */
 });
 
@@ -86,7 +86,7 @@ store.applyPatch(results.backPatches);
 console.log(store.get(['books', 1]));
 /**
 * The output is:
-* {id: 'def', name: 'fruits', content: ['apple', 'orange', 'lemon']}
+* {id: 'book2', name: 'fruits', content: ['apple', 'orange', 'lemon']}
 */
 ```
 #### Changing the store and update corresponding server side data
@@ -95,13 +95,13 @@ When you update one book in store, You may want to make an ajax request to updat
 These can be done with **jsonstore-js** easily:
 ```javascript
 var results = store.do(functon(store){
-    store.goTo(['books', {__value: {id: 'def'}}])
+    store.goTo(['books', {__value: {id: 'book2'}}])
         .remove(['content', 0])
         .update({__value: 'lemon'}, 'grape');
     console.log(store.get(['books', 1]));
     /**
     * The output is:
-    * {id:'def', name: 'fruits', content: ['orange', 'grape']}
+    * {id:'book2', name: 'fruits', content: ['orange', 'grape']}
     */
 });
 
@@ -119,12 +119,12 @@ jQuery.ajax({
 
 // server side pseudo-codes
 var patches = request.body,
-    book = getBookById('def'),
+    book = getBookById('book2'),
     store = new JSONStore({store: book});
     
 var newBook = store.applyPatch(patches).get();
 
-saveBookById('def', newBook);
+saveBookById('book2', newBook);
 ```
 The `store.do` method executes and record store operations in it's callback param. The value returned by `store.do` is an object like:
  ```
@@ -143,24 +143,26 @@ The `store.do` method executes and record store operations in it's callback para
 | store | the data used to construct a store | any safe types | `undefined` |
 | copyStore | copy the **store** param | `Boolean` | `true` |
 
+### About the `path` param:
+Param `path` used by methods is composed of **pathItem**s, it can be an array of **pathItem**s or just one **pathItem**. The **pathItem** can be two types: **key** and **value**, a **key** is the key of object or array, a **value** is an object like `{__value: 'bar'}` or `{__value: {foo: 'bar'}}`.
 
 ### Data processing methods:
-- [store.add](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/ADD.md)
-- [store.remove](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/REMOVE.md)
-- [store.update](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/UPDATE.md)
-- [store.moveUp](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/MOVEUP.md)
-- [store.moveDown](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/MOVEDOWN.md)
-- [store.moveTo](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/MOVETO.md)
-- [store.exchange](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/EXCHANGE.md)
-- [store.spreadArray](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/SPREADARRAY.md)
-- [store.spread2dArrayRow](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/SPREAD2DARRAYROW.md)
-- [store.spread2dArrayCol](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/SPREAD2DARRAYCOL.md)
+- [store.add(path, value, key)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/ADD.md)
+- [store.remove(path)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/REMOVE.md)
+- [store.update(path, value, forceUpdate)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/UPDATE.md)
+- [store.moveUp(path)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/MOVEUP.md)
+- [store.moveDown(path)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/MOVEDOWN.md)
+- [store.moveTo(from, to, key)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/MOVETO.md)
+- [store.exchange(from, to)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/EXCHANGE.md)
+- [store.spreadArray(path, begin, infilling)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/SPREADARRAY.md)
+- [store.spread2dArrayRow(path, begin, rows)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/SPREAD2DARRAYROW.md)
+- [store.spread2dArrayCol(path, begin, cols)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/SPREAD2DARRAYCOL.md)
 
 ### Operation flows managing methods:
-- [store.do](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/DO.md)
-- [store.goTo](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/GOTO.md)
-- [store.applyPatch](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/APPLYPATCH.md)
-- [store.patch.*](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/PATCH.md)
+- [store.do(callback)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/DO.md)
+- [store.goTo(path, addUp)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/GOTO.md)
+- [store.applyPatch(patches)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/APPLYPATCH.md)
+- [store.patch.create*](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/PATCH.md)
 
 ## License
 MIT
