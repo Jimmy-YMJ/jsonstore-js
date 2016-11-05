@@ -1,7 +1,7 @@
 # store.update(path, value, forceUpdate)
 | **Param** | **Description** | **type** | **default** |
 | --- | --- | --- | --- |
-| path  | The (path)[https://github.com/Jimmy-YMJ/jsonstore-js#about-the-path-param] to arrive. | `Array` or `String` or `Number` | `[]` |
+| path  | The [path](https://github.com/Jimmy-YMJ/jsonstore-js#about-the-path-param) to arrive. | `Array` or `String` or `Number` | `[]` |
 | value  | The value used to update. | any | `undefined`|
 | forceUpdate | Add the value to `path` referenced data when it's `true`. | `Boolean` | `false` |
 

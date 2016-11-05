@@ -1,7 +1,7 @@
 # store.add(path, value, key)
 | **Param** | **Description** | **type** | **default** |
 | --- | --- | --- | --- |
-| path  | The (path)[https://github.com/Jimmy-YMJ/jsonstore-js#about-the-path-param] to arrive. | `Array` or `String` or `Number` | `[]` |
+| path  | The [path](https://github.com/Jimmy-YMJ/jsonstore-js#about-the-path-param) to arrive. | `Array` or `String` or `Number` | `[]` |
 | value  | The value to add. | any | `undefined`|
 | key | The key for the value param. | `String` or `Number` | `undefined` |
 

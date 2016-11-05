@@ -2,11 +2,11 @@
 
 | **Param** | **Description** | **type** | **default** |
 | --- | --- | --- | --- |
-| from  | The (path)[https://github.com/Jimmy-YMJ/jsonstore-js#about-the-path-param] of value to move. | `Array` or `String` or `Number` | `[]` |
-| to  | The (path)[https://github.com/Jimmy-YMJ/jsonstore-js#about-the-path-param] of target to put the `from`. | `Array` or `String` or `Number` | `[]`|
+| from  | The [path](https://github.com/Jimmy-YMJ/jsonstore-js#about-the-path-param) of value to move. | `Array` or `String` or `Number` | `[]` |
+| to  | The [path](https://github.com/Jimmy-YMJ/jsonstore-js#about-the-path-param) of target to put the `from`. | `Array` or `String` or `Number` | `[]`|
 | key | The key for the `from` value in `to`. | `String` or `Number` | `undefined` |
 
-This method is a combination of (remove)[https://github.com/Jimmy-YMJ/jsonstore-js/blob/master/docs/REMOVE.md] and (add)[https://github.com/Jimmy-YMJ/jsonstore-js/blob/master/docs/ADD.md].
+This method is a combination of [remove](https://github.com/Jimmy-YMJ/jsonstore-js/blob/master/docs/REMOVE.md) and [add](https://github.com/Jimmy-YMJ/jsonstore-js/blob/master/docs/ADD.md).
 
 ```
 store.moveTo(from, to, key);

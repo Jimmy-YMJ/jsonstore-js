@@ -1,7 +1,7 @@
 # store.moveDown(path)
 | **Param** | **Description** | **type** | **default** |
 | --- | --- | --- | --- |
-| path  | The (path)[https://github.com/Jimmy-YMJ/jsonstore-js#about-the-path-param] to arrive. | `Array` or `String` or `Number` | `[]` |
+| path  | The [path](https://github.com/Jimmy-YMJ/jsonstore-js#about-the-path-param) to arrive. | `Array` or `String` or `Number` | `[]` |
 
 Move down the item referenced by `path` if the item is in an array.
 

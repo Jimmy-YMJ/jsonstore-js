@@ -2,7 +2,7 @@
 
 | **Param** | **Description** | **type** | **default** |
 | --- | --- | --- | --- |
-| path  | The (path)[https://github.com/Jimmy-YMJ/jsonstore-js#about-the-path-param] of array to spread. | `Array` or `String` or `Number` | `[]` |
+| path  | The [path](https://github.com/Jimmy-YMJ/jsonstore-js#about-the-path-param) of array to spread. | `Array` or `String` or `Number` | `[]` |
 | begin  | The begin index of array row. | `Number` | The length of the array referenced by `path`. |
 | rows | The rows to fill the array. When the `rows` is an array, all the row of `rows` will be added to target array. When `rows` is a positive number, counts of `rows` `null`s will be added to array. When the `rows` is a negative number, counts of `rows` rows will be removed. | `Array` or `Number` | `undefined` |
 
