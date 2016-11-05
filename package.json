@@ -1,6 +1,6 @@
 {
   "name": "jsonstore-js",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A javascript JSON data store with manifold abilities of data processing",
   "main": "store.js",
   "scripts": {
@@ -13,6 +13,10 @@
     "data-store",
     "data-processing"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jimmy-YMJ/jsonstore-js"
+  },
   "author": "Jimmy-YMJ",
   "license": "MIT",
   "dependencies": {},
