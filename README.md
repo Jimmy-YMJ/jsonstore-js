@@ -71,7 +71,7 @@ console.log(store.get( 'books' ));
 
 #### Changing the store and rollback
 ```javascript
-var results = store.do(functon(store){
+var results = store.do(functon(store, data){
     store.goTo(['books', {__value: {name: 'fruits'}}])
         .remove(['content', 0])
         .update({__value: 'lemon'}, 'grape');
@@ -80,7 +80,13 @@ var results = store.do(functon(store){
     * The output is:
     * {id: 'book2', name: 'fruits', content: ['orange', 'grape']}
     */
-});
+    
+    console.log(data);
+    /**
+    * The output is:
+    * {foo: 'foo'}
+    */
+}, {foo: 'foo'});
 
 store.applyPatch(results.backPatches);
 console.log(store.get(['books', 1]));
@@ -126,7 +132,7 @@ var newBook = store.applyPatch(patches).get();
 
 saveBookById('book2', newBook);
 ```
-The `store.do` method executes and record store operations in it's callback param. The value returned by `store.do` is an object like:
+The `store.do` method executes and record store operations in it's `action` param. The value returned by `store.do` is an object like:
  ```
  {
     patches: [...], // the really patches on store
@@ -164,7 +170,7 @@ Param `path` used by methods is composed of **pathItem**s, it can be an array of
 All these methods return the sore itself.
 
 ### Operation flows managing methods:
-- [store.do(callback)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/DO.md)
+- [store.do([name,] action, data)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/DO.md)
 - [store.goTo(path, addUp)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/GOTO.md)
 - [store.applyPatch(patches)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/APPLYPATCH.md)
 - [store.patch.create*](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/PATCH.md)
