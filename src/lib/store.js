@@ -178,10 +178,15 @@ JSONDataStore.prototype = {
     }
     return this;
   },
-  do: function (callback) {
+  do: function (name, action, data) {
+    if(typeof name === 'function'){
+      data = action;
+      action = name;
+      name = '';
+    }
     var result = {};
     this.isDoing = true;
-    callback(this);
+    action(this, data, name);
     // compose result
     result.patches = this.patches;
     result.relativePatches = this.relativePatches;
