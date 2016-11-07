@@ -113,7 +113,7 @@ var results = store.do(functon(store){
 
 jQuery.ajax({
     method: "PATCH",
-    url: "/books/def",
+    url: "/books/book2",
     data: results.relativePatches,
     success: function() {
       // do something
