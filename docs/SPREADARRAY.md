@@ -9,7 +9,7 @@
 This method returns the store itself.
 
 ## Examples
-```
+```javascript
 var JSONStore = require('jsonstore-js'),
     storeData = ['a', 'b', 'c'],
     createStore = function(){

@@ -9,7 +9,7 @@ This method returns the store itself.
 
 ## Examples
 The store to use:
-```
+```javascript
 var JSONStore = require('jsonstore-js'),
     storeData = {
         obj: {color: 'red'},
@@ -20,7 +20,7 @@ var JSONStore = require('jsonstore-js'),
     };
 ```
 ### Add a value to an object
-```
+```javascript
 var store = createStore();
 
 store.add('obj', 'bar');
@@ -34,7 +34,7 @@ console.log(store.get('obj'));
 Adding a value to an object without a key is not valid.
 
 ### Add a value to an array
-```
+```javascript
 var store = createStore();
 store.add('arr', 'bar');
 console.log(store.get('arr'));

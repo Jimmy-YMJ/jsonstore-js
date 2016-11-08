@@ -8,11 +8,11 @@
 
 This method is a combination of [remove](https://github.com/Jimmy-YMJ/jsonstore-js/blob/master/docs/REMOVE.md) and [add](https://github.com/Jimmy-YMJ/jsonstore-js/blob/master/docs/ADD.md).
 
-```
+```javascript
 store.moveTo(from, to, key);
 ```
 is equal to:
-```
+```javascript
 store.add(to, store.get(from), key);
 store.remove(from);
 ```

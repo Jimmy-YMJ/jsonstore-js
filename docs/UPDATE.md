@@ -9,7 +9,7 @@ This method returns the store itself.
 
 ## Examples
 The store to use:
-```
+```javascript
 var JSONStore = require('jsonstore-js'),
     storeData = { color: 'red' },
     createStore = function(){
@@ -17,7 +17,7 @@ var JSONStore = require('jsonstore-js'),
     };
 ```
 ### Update a value
-```
+```javascript
 var store = createStore();
 
 store.update('color', 'green');
@@ -29,7 +29,7 @@ cosnole.log(store.get());
 // output: {color: 'green'}
 ```
 ### Update a value with `forceUpdate = true`
-```
+```javascript
 store.update('name', 'foo', true);
 cosnole.log(store.get());
 // output: {color: 'green', name: 'foo'}

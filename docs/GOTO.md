@@ -10,7 +10,7 @@ This method can only be used in [store.do(callback)](https://github.com/Jimmy-YM
 This method returns the store itself.
 
 ## Examples
-```
+```javascript
 var JSONStore = require('jsonstore-js'),
     storeData = {
         name: 'A store',

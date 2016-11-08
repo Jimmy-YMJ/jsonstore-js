@@ -9,11 +9,11 @@ This method is a combination of [update](https://github.com/Jimmy-YMJ/jsonstore-
 
 This method returns the store itself.
 
-```
+```javascript
 store.exchange(from, to);
 ```
 is equal to:
-```
+```javascript
 var fromRef = this._getRef(from),
     toRef = this.get(to);
     

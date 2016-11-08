@@ -7,7 +7,7 @@
 | data | It will be passed to `action` as `data` param. | any | `undefined`|
 
 This method executes and record store operations in it's `action` param. The value returned by `store.do` is an object like:
- ```
+ ```javascript
  {
     patches: [...], // the really patches on store
     relativePatches: [...], // patches with paths relative to the path of 'store.goTo(path)'
@@ -16,7 +16,7 @@ This method executes and record store operations in it's `action` param. The val
  ```
  
 ## Examples
-```
+```javascript
 var JSONStore = require('jsonstore-js');
 var storeData = {
     name: 'A store',
