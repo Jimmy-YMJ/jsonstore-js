@@ -356,7 +356,7 @@ JSONDataStore.prototype = {
     return this;
   },
   get: function (path, copy) {
-    if(path = this._formatPath(path)){
+    if(path = this._getFullPath(path)){
       return copy === false ? this._getRef(path) : utils.copy(this._getRef(path));
     }
   },
