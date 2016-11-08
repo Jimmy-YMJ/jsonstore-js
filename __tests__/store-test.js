@@ -93,6 +93,23 @@ it('test store.update', () => {
   validateBackPatches(createStore(), storeOperation);
 });
 
+it('test store.set', () => {
+  var storeOperation = function (store, inDoing) {
+    validateMethodResult(store.set(['children', {__value: {name: 'chapter1'}}, 'content'], 'updated content'), store, inDoing);
+    expect(store.get(['children', {__value: {name: 'chapter1'}}, 'content']))
+      .toBe('updated content');
+
+    validateMethodResult(store.set(['content', 4], 'foo'), store, inDoing);
+    expect(store.get(['content', 4])).toBe(undefined);
+
+    validateMethodResult(store.set(['content', 4], 'foo'), store, inDoing);
+    expect(store.get(['content', 2])).toBe('foo');
+  };
+
+  storeOperation(createStore(), false);
+  validateBackPatches(createStore(), storeOperation);
+});
+
 it('test store.moveUp', () => {
   var storeOperation = function (store, inDoing) {
     validateMethodResult(store.moveUp(['content', 1]), store, inDoing);
