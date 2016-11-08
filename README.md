@@ -163,6 +163,7 @@ Param `path` used by methods is composed of **pathItem**s, it can be an array of
 - [store.moveDown(path)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/MOVEDOWN.md)
 - [store.moveTo(from, to, key)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/MOVETO.md)
 - [store.exchange(from, to)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/EXCHANGE.md)
+- [store.extendObject(path, a, b, c, d, e)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/EXTENDOBJECT.md)
 - [store.spreadArray(path, begin, infilling)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/SPREADARRAY.md)
 - [store.spread2dArrayRow(path, begin, rows)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/SPREAD2DARRAYROW.md)
 - [store.spread2dArrayCol(path, begin, cols)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/SPREAD2DARRAYCOL.md)
