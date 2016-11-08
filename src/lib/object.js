@@ -27,9 +27,11 @@ const extend = function () {
   var target = arguments[0], argLen = arguments.length;
   for (var i = 1; i < argLen; i++) {
     var source = arguments[i], key;
-    for (key in source) {
-      if (source.hasOwnProperty(key)) {
-        target[key] = utils.copy(source[key]);
+    if(utils.type(source) === 'object'){
+      for (key in source) {
+        if (source.hasOwnProperty(key)) {
+          target[key] = utils.copy(source[key]);
+        }
       }
     }
   }

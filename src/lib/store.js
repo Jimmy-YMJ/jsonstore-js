@@ -10,6 +10,7 @@ const patchTypes = {
   moveDown: 'moveDown',
   moveTo: 'moveTo',
   exchange: 'exchange',
+  extendObject: 'extendObject',
   spreadArray: 'spreadArray',
   spread2dArrayCol: 'spread2dArrayCol',
   spread2dArrayRow: 'spread2dArrayRow'
@@ -48,6 +49,9 @@ const patchMethods = {
   },
   createExchange: function (from, to) {
     return createPatch(patchTypes.exchange, arguments);
+  },
+  createExtendObject: function (path, a, b, c, d, e) {
+    return createPatch(patchTypes.extendObject, arguments);
   },
   createSpreadArray: function (path, begin, infilling) {
     return createPatch(patchTypes.spreadArray, arguments);
@@ -291,6 +295,17 @@ JSONDataStore.prototype = {
       this.update(from, toRef);
       this.update(to, fromRef);
     }
+    return this;
+  },
+  extendObject: function (path, a, b, c, d, e) {
+    var ref;
+    if(!(path = this._formatPath(path)) || utils.type(ref = this._getRef(path)) !== 'object') return this;
+    if(this.isDoing){
+      this.patches.push(patchMethods.createExtendObject.apply(this, arguments));
+      this.relativePatches.push(patchMethods.createExtendObject(this._getRelativePath(path), a, b, c, d, e));
+      this.backPatches.push(patchMethods.createUpdate(path, this.get(path)));
+    }
+    object.extend(ref, a, b, c, d, e);
     return this;
   },
   spreadArray: function (path, begin, infilling) {
