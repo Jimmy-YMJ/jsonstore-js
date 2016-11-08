@@ -145,6 +145,16 @@ it('test store.exchange', () => {
   validateBackPatches(createStore(), storeOperation);
 });
 
+it('test store.extendObject', () => {
+  var storeOperation = function (store, inDoing) {
+    validateMethodResult(store.extendObject(['content', 0], {foo: 'foo'}, {bar: 'bar'}), store, inDoing);
+    expect(store.get(['content', 0])).toEqual({type: 'h1', content: "This is a fantastic book, enjoy it please.", foo: 'foo', bar: 'bar'});
+  };
+
+  storeOperation(createStore(), false);
+  validateBackPatches(createStore(), storeOperation);
+});
+
 it('test store.spreadArray', () => {
   var storeOperation = function (store, inDoing) {
     validateMethodResult(store.spreadArray('content', undefined, ['something']), store, inDoing);
