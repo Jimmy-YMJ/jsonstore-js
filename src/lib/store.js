@@ -272,6 +272,9 @@ JSONDataStore.prototype = {
     }
     return this;
   },
+  set: function (path, value) {
+    return this.update(path, value, true);
+  },
   moveUp: function (path) {
     return this._moveArrayItem(path, true);
   },
