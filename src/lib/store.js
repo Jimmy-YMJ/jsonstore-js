@@ -66,6 +66,7 @@ const patchMethods = {
 
 function JSONDataStore(options) {
   options = options || {};
+  this.initialOptions = utils.copy(options);
   var store = options.store, copyStore = options.copyStore !== false;
   this.store = copyStore ? utils.copy(store) : store;
   // 'do' about attributes
@@ -170,6 +171,9 @@ JSONDataStore.prototype = {
   },
   _getRelativePath: function (fullPath) {
     return fullPath.slice(this.currentPath.length);
+  },
+  reInit: function () {
+    JSONDataStore.call(this, this.initialOptions);
   },
   goTo: function (path, addUp) {
     if(!this.isDoing){
