@@ -156,6 +156,7 @@ Param `path` used by methods is composed of **pathItem**s, it can be an array of
 - [store.get(path, copy)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/GET.md)
 
 ### Data processing methods:
+- store.reInit(), initiate the store use constructor options.
 - [store.add(path, value, key)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/ADD.md)
 - [store.remove(path)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/REMOVE.md)
 - [store.update(path, value, forceUpdate)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/UPDATE.md)
