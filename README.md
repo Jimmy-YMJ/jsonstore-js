@@ -159,6 +159,7 @@ Param `path` used by methods is composed of **pathItem**s, it can be an array of
 - [store.add(path, value, key)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/ADD.md)
 - [store.remove(path)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/REMOVE.md)
 - [store.update(path, value, forceUpdate)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/UPDATE.md)
+- store.set(path, value), it's equal to [store.update(path, value, true)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/UPDATE.md)
 - [store.moveUp(path)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/MOVEUP.md)
 - [store.moveDown(path)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/MOVEDOWN.md)
 - [store.moveTo(from, to, key)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/MOVETO.md)
