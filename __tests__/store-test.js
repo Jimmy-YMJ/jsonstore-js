@@ -54,6 +54,20 @@ it('test sore._formatPath', () => {
     .toEqual(['children', 1]);
 });
 
+it('test store.reInit', () => {
+  var store = createStore();
+
+  store.add(['content'], 'content', 0);
+  store.add([], 'foo');
+  store.add([], 'bar', 'foo');
+  expect(store.get(['content', 0])).toBe('content');
+  expect(store.get('foo')).toBe('bar');
+
+  store.reInit();
+  expect(store.get(['content', 0])).toEqual({type: 'h1', content: "This is a fantastic book, enjoy it please."});
+  expect(store.get('foo')).toBe(undefined);
+});
+
 it('test store.add', () => {
   var storeOperation = function (store, inDoing) {
     validateMethodResult(store.add(['content'], 'content', 0), store, inDoing);
