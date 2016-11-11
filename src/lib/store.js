@@ -172,8 +172,9 @@ JSONDataStore.prototype = {
   _getRelativePath: function (fullPath) {
     return fullPath.slice(this.currentPath.length);
   },
-  reInit: function () {
-    JSONDataStore.call(this, this.initialOptions);
+  reInit: function (options) {
+    JSONDataStore.call(this, options || this.initialOptions);
+    return this;
   },
   goTo: function (path, addUp) {
     if(!this.isDoing){
