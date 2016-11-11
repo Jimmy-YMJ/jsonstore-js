@@ -1,6 +1,6 @@
 {
   "name": "jsonstore-js",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "A javascript JSON data store with manifold abilities of data processing",
   "main": "store.js",
   "scripts": {
