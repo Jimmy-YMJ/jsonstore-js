@@ -1,10 +1,12 @@
-# store.spread2dArrayCol(path, begin, cols)
+# store.spread2dArrayCol(path, begin, cols, simpleInfilling, count)
 
 | **Param** | **Description** | **type** | **default** |
 | --- | --- | --- | --- |
 | path  | The [path](https://github.com/Jimmy-YMJ/jsonstore-js#about-the-path-param) of array to spread. | `Array` or `String` or `Number` | `[]` |
 | begin  | The begin index of array column. | `Number` | The length of the array referenced by `path`. |
 | cols | The columns to fill the array. When the `cols` is an array, each items of `cols` will be added to target array column. When `cols` is a positive number, counts of `cols` `null`s will be added to each col. When the `cols` is a negative number, counts of `cols` columns will be removed. | `Array` or `Number` | `undefined` |
+| simpleInfilling  | Whether the param `cols` is a simple infilling. When it's true, all items of new added will be filled with `cols`. | `Boolean` | `false` |
+| count  | The count of columns to spread when `simpleInfilling` is `true`. | `Number` | `1` |
 
 This method returns the store itself.
 
@@ -60,6 +62,17 @@ console.log(store.get());
 * [
 *   ['b'],
 *   ['d']
+* ]
+*/
+
+var store = createStore();
+store.spread2dArrayCol([], 0, 'foo', true, 2);
+console.log(store.get());
+/**
+* output:
+* [
+*   ['foo', 'foo', 'a', 'b'],
+*   ['foo', 'foo', 'c', 'd']
 * ]
 */
 ```
