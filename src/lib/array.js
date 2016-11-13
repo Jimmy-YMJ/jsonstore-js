@@ -6,7 +6,7 @@ const createArray = function(length, infilling){
   length = length || 0;
   var arr = [], i = 0;
   for(; i < length; i ++){
-    arr.push(infilling === undefined ? null : infilling);
+    arr.push(infilling === undefined ? null : utils.copy(infilling));
   }
   return arr;
 };
