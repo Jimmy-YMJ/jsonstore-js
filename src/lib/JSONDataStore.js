@@ -378,4 +378,6 @@ JSONDataStore.prototype = {
   }
 };
 
+JSONDataStore.patch = patchMethods;
+
 module.exports = JSONDataStore;

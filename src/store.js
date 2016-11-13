@@ -1,1 +1,1 @@
-module.exports = require('./lib/store');
+module.exports = require('./lib/JSONDataStore');
