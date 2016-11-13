@@ -26,6 +26,10 @@ it('test array.spreadArray', () => {
   arr = ['a', 'a'];
   array.spreadArray(arr, 0, -1);
   expect(arr).toEqual(['a']);
+
+  arr = ['a', 'a'];
+  array.spreadArray(arr, 0, -1, true);
+  expect(arr).toEqual([-1, 'a', 'a']);
 });
 
 it('test array.spread2dArrayRow', () => {
@@ -44,6 +48,10 @@ it('test array.spread2dArrayRow', () => {
   arr = [['a'], ['c']];
   array.spread2dArrayRow(arr, -1, -1);
   expect(arr).toEqual([['a']]);
+
+  arr = [['a', 'b']];
+  array.spread2dArrayRow(arr, -1, -1, true, 2);
+  expect(arr).toEqual([[-1, -1], [-1, -1], ['a', 'b']]);
 });
 
 it('test array.spread2dArrayCol', () => {
@@ -62,6 +70,10 @@ it('test array.spread2dArrayCol', () => {
   arr = [['a', 'c']];
   array.spread2dArrayCol(arr, -2, -1);
   expect(arr).toEqual([['c']]);
+
+  arr = [['a'], ['b']];
+  array.spread2dArrayCol(arr, 1, -1, true, 2);
+  expect(arr).toEqual([['a', -1, -1], ['b', -1, -1]]);
 });
 
 it('test array.moveArrayItemUp', () => {
