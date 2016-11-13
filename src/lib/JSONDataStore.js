@@ -326,7 +326,7 @@ JSONDataStore.prototype = {
     if(!(path = this._getFullPath(path)) || utils.type(ref = this._getRef(path)) !== 'array'){
       return this;
     }
-    begin = begin || ref.length;
+    begin = typeof begin === 'number' ? begin : ref.length;
     if(!(utils.type(begin) === 'number')) return this;
     if(this.isDoing){
       this.patches.push(patchMethods.createSpreadArray(path, begin, infilling));
@@ -342,7 +342,7 @@ JSONDataStore.prototype = {
       || !(utils.type(begin) === 'number')){
       return this;
     }
-    begin = begin || ref.length;
+    begin = typeof begin === 'number' ? begin : ref.length;
     if(!(utils.type(begin) === 'number')) return this;
     if(this.isDoing){
       this.patches.push(patchMethods.createSpread2dArrayRow(path, begin, rows));
@@ -358,7 +358,7 @@ JSONDataStore.prototype = {
       || !(utils.type(begin) === 'number')){
       return this;
     }
-    begin = begin || ref.length;
+    begin = typeof begin === 'number' ? begin : ref[0].length;
     if(!(utils.type(begin) === 'number')) return this;
     if(this.isDoing){
       this.patches.push(patchMethods.createSpread2dArrayCol(path, begin, cols));
