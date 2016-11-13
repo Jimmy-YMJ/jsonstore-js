@@ -57,13 +57,13 @@ const patchMethods = {
   createExtendObject: function (path, a, b, c, d, e) {
     return createPatch(patchTypes.extendObject, arguments);
   },
-  createSpreadArray: function (path, begin, infilling) {
+  createSpreadArray: function (path, begin, infilling, simpleInfilling, count) {
     return createPatch(patchTypes.spreadArray, arguments);
   },
-  createSpread2dArrayRow: function (path, begin, rows) {
+  createSpread2dArrayRow: function (path, begin, rows, simpleInfilling, count) {
     return createPatch(patchTypes.spread2dArrayRow, arguments);
   },
-  createSpread2dArrayCol: function (path, begin, cols) {
+  createSpread2dArrayCol: function (path, begin, cols, simpleInfilling, count) {
     return createPatch(patchTypes.spread2dArrayCol, arguments);
   }
 };
@@ -321,7 +321,7 @@ JSONDataStore.prototype = {
     object.extend(ref, a, b, c, d, e, f);
     return this;
   },
-  spreadArray: function (path, begin, infilling) {
+  spreadArray: function (path, begin, infilling, simpleInfilling, count) {
     var ref;
     if(!(path = this._getFullPath(path)) || utils.type(ref = this._getRef(path)) !== 'array'){
       return this;
@@ -329,14 +329,14 @@ JSONDataStore.prototype = {
     begin = typeof begin === 'number' ? begin : ref.length;
     if(!(utils.type(begin) === 'number')) return this;
     if(this.isDoing){
-      this.patches.push(patchMethods.createSpreadArray(path, begin, infilling));
-      this.relativePatches.push(patchMethods.createSpreadArray(this._getRelativePath(path), begin, infilling));
+      this.patches.push(patchMethods.createSpreadArray(path, begin, infilling, simpleInfilling, count));
+      this.relativePatches.push(patchMethods.createSpreadArray(this._getRelativePath(path), begin, infilling, simpleInfilling, count));
       this.backPatches.unshift(patchMethods.createUpdate(path, this.get(path)));
     }
-    array.spreadArray(ref, begin, infilling);
+    array.spreadArray(ref, begin, infilling, simpleInfilling, count);
     return this;
   },
-  spread2dArrayRow: function (path, begin, rows) {
+  spread2dArrayRow: function (path, begin, rows, simpleInfilling, count) {
     var ref;
     if(!(path = this._getFullPath(path)) || !array.is2dArray(ref = this._getRef(path))
       || !(utils.type(begin) === 'number')){
@@ -345,14 +345,14 @@ JSONDataStore.prototype = {
     begin = typeof begin === 'number' ? begin : ref.length;
     if(!(utils.type(begin) === 'number')) return this;
     if(this.isDoing){
-      this.patches.push(patchMethods.createSpread2dArrayRow(path, begin, rows));
-      this.relativePatches.push(patchMethods.createSpread2dArrayRow(this._getRelativePath(path), begin, rows));
+      this.patches.push(patchMethods.createSpread2dArrayRow(path, begin, rows, simpleInfilling, count));
+      this.relativePatches.push(patchMethods.createSpread2dArrayRow(this._getRelativePath(path), begin, rows, simpleInfilling, count));
       this.backPatches.unshift(patchMethods.createUpdate(path, this.get(path)));
     }
-    array.spread2dArrayRow(ref, begin, rows);
+    array.spread2dArrayRow(ref, begin, rows, simpleInfilling, count);
     return this;
   },
-  spread2dArrayCol: function (path, begin, cols) {
+  spread2dArrayCol: function (path, begin, cols, simpleInfilling, count) {
     var ref;
     if(!(path = this._getFullPath(path)) || !array.is2dArray(ref = this._getRef(path))
       || !(utils.type(begin) === 'number')){
@@ -361,11 +361,11 @@ JSONDataStore.prototype = {
     begin = typeof begin === 'number' ? begin : ref[0].length;
     if(!(utils.type(begin) === 'number')) return this;
     if(this.isDoing){
-      this.patches.push(patchMethods.createSpread2dArrayCol(path, begin, cols));
-      this.relativePatches.push(patchMethods.createSpread2dArrayCol(this._getRelativePath(path), begin, cols));
+      this.patches.push(patchMethods.createSpread2dArrayCol(path, begin, cols, simpleInfilling, count));
+      this.relativePatches.push(patchMethods.createSpread2dArrayCol(this._getRelativePath(path), begin, cols, simpleInfilling, count));
       this.backPatches.unshift(patchMethods.createUpdate(path, this.get(path)));
     }
-    array.spread2dArrayCol(ref, begin, cols);
+    array.spread2dArrayCol(ref, begin, cols, simpleInfilling, count);
     return this;
   },
   get: function (path, copy) {

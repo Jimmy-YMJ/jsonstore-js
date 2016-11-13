@@ -89,11 +89,13 @@ const moveArrayItemDown = function (arr, index) {
   }
 };
 
-const spreadArray = function (arr, begin, infilling) {
+const spreadArray = function (arr, begin, infilling, simpleInfilling, count) {
   var deleted = [];
   if(utils.type(arr) === 'array'){
     var infillingType = utils.type(infilling);
-    if(infillingType === 'array'){
+    if(simpleInfilling === true){
+      splice.apply(arr, [begin, 0].concat(createArray(parseInt(count) || 1, infilling)));
+    }else if(infillingType === 'array'){
       splice.apply(arr, [begin, 0].concat(infilling))
     }else if(infillingType === 'number'){
       if(infilling > 0){
@@ -106,11 +108,13 @@ const spreadArray = function (arr, begin, infilling) {
   return deleted;
 };
 
-const spread2dArrayRow = function (arr, begin, rows) {
+const spread2dArrayRow = function (arr, begin, rows, simpleInfilling, count) {
   var deleted = [], rowsType = utils.type(rows);
   if(is2dArray(arr)){
     var colCount = arr[0].length;
-    if(rowsType === 'number'){
+    if(simpleInfilling === true){
+      spreadArray(arr, begin, createArray(colCount, rows), true, count);
+    }else if(rowsType === 'number'){
       if(rows > 0){
         spreadArray(arr, begin, create2dArray(rows, colCount));
       }else if(rows < 0){
@@ -123,11 +127,15 @@ const spread2dArrayRow = function (arr, begin, rows) {
   return deleted;
 };
 
-const spread2dArrayCol = function (arr, begin, cols) {
+const spread2dArrayCol = function (arr, begin, cols, simpleInfilling, count) {
   var deleted = [], deletedCol, colsType = utils.type(cols);
   if(is2dArray(arr)){
     var rowCount = arr.length, i = 0;
-    if(colsType === 'number'){
+    if(simpleInfilling === true){
+      for(; i < rowCount; i ++){
+        spreadArray(arr[i], begin, cols, true, count);
+      }
+    } else if(colsType === 'number'){
       for(; i < rowCount; i ++){
         deletedCol = spreadArray(arr[i], begin, cols);
         if(deletedCol.length){
