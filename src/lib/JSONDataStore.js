@@ -185,7 +185,7 @@ JSONDataStore.prototype = {
       throw new Error('You are using store.goTo outside store.do!');
     }
     if(addUp === true){
-      this.currentPath = this._formatPath(this.currentPath.concat(this._formatPath(path, false)));
+      this.currentPath = this._getFullPath(path);
     }else {
       this.currentPath = this._formatPath(path);
     }
@@ -261,8 +261,7 @@ JSONDataStore.prototype = {
     return this;
   },
   update: function (path, value, forceUpdate) {
-    path = this._formatPath(path, false);
-    var lastKey, fullPath = this._formatPath(path);
+    var lastKey, fullPath = this._getFullPath(path);
     if(fullPath){
       if(this.isDoing){
         this.patches.push(patchMethods.createUpdate(fullPath, value));
@@ -300,8 +299,8 @@ JSONDataStore.prototype = {
     return this;
   },
   exchange: function (from, to) {
-    from = this._formatPath(from);
-    to = this._formatPath(to);
+    from = this._getFullPath(from);
+    to = this._getFullPath(to);
     if(from && to){
       var fromRef = this._getRef(from),
         toRef = this.get(to);
@@ -312,7 +311,7 @@ JSONDataStore.prototype = {
   },
   extendObject: function (path, a, b, c, d, e, f) {
     var ref;
-    if(!(path = this._formatPath(path)) || utils.type(ref = this._getRef(path)) !== 'object') return this;
+    if(!(path = this._getFullPath(path)) || utils.type(ref = this._getRef(path)) !== 'object') return this;
     if(this.isDoing){
       this.patches.push(patchMethods.createExtendObject.apply(this, arguments));
       this.relativePatches.push(patchMethods.createExtendObject(this._getRelativePath(path), a, b, c, d, e, f));
@@ -323,7 +322,7 @@ JSONDataStore.prototype = {
   },
   spreadArray: function (path, begin, infilling) {
     var ref;
-    if(!(path = this._formatPath(path)) || utils.type(ref = this._getRef(path)) !== 'array'){
+    if(!(path = this._getFullPath(path)) || utils.type(ref = this._getRef(path)) !== 'array'){
       return this;
     }
     begin = begin || ref.length;
@@ -338,7 +337,7 @@ JSONDataStore.prototype = {
   },
   spread2dArrayRow: function (path, begin, rows) {
     var ref;
-    if(!(path = this._formatPath(path)) || !array.is2dArray(ref = this._getRef(path))
+    if(!(path = this._getFullPath(path)) || !array.is2dArray(ref = this._getRef(path))
       || !(utils.type(begin) === 'number')){
       return this;
     }
@@ -354,7 +353,7 @@ JSONDataStore.prototype = {
   },
   spread2dArrayCol: function (path, begin, cols) {
     var ref;
-    if(!(path = this._formatPath(path)) || !array.is2dArray(ref = this._getRef(path))
+    if(!(path = this._getFullPath(path)) || !array.is2dArray(ref = this._getRef(path))
       || !(utils.type(begin) === 'number')){
       return this;
     }
