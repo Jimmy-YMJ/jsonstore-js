@@ -173,7 +173,7 @@ Param `path` used by methods is composed of **pathItem**s, it can be an array of
 All these methods return the sore itself.
 
 ### Operation flows managing methods:
-- [store.do([name,] action, data)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/DO.md)
+- [store.do([name,] action, a, b, c, d, e, f)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/DO.md)
 - [store.goTo(path, addUp)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/GOTO.md)
 - [store.applyPatch(patches)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/APPLYPATCH.md)
 - [store.patch.create*(or JSONStore.patch.create*)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/PATCH.md)

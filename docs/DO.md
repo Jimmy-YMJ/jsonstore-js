@@ -1,10 +1,10 @@
-# store.do([name,] action, data)
+# store.do([name,] action, a, b, c, d, e, f)
 
 | **Param** | **Description** | **type** | **default** |
 | --- | --- | --- | --- |
 | name | The name of this 'do' action, it will be passed to `action` as `name` param and it's optional, | `String` | `''`|
 | action  | A callback which will be executed by passing a store , `data` and `name`. | `Function` | `undefined` |
-| data | It will be passed to `action` as `data` param. | any | `undefined`|
+| a, b, c, d, e, f | These will be passed to `action` as parameters. | any | `undefined`|
 
 This method executes and record store operations in it's `action` param. The value returned by `store.do` is an object like:
  ```javascript
@@ -29,23 +29,22 @@ var store = new JSONStore({
     store: storeData
 });
 
-store.do('a test', functon(store, data, name){
+var action = function(store, foo, bar){
     store.goTo(['books', {__value: {id: 'book2'}}])
         .remove(['content', 0])
         .update({__value: 'lemon'}, 'grape');
-        
-    console.log(data);
-    /**
-    * The output is:
-    * {bar: 'bar'}
-    */
-    
-    console.log(name);
-    /**
-    * The output is:
-    * 'a test'
-    */
-}, {bar: 'bar'});
+            
+    console.log(foo);
+    console.log(bar);
+}
+
+store.do('a test', action, 'foo', 'bar');
+/**
+* The output is:
+* 'foo'
+* 'bar'
+*/
+
 
 console.log(store.get(['books', 1]));
 
