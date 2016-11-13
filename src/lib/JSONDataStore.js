@@ -6,6 +6,7 @@ const patchTypes = {
   add: 'add',
   remove: 'remove',
   update: 'update',
+  set: 'set',
   moveUp: 'moveUp',
   moveDown: 'moveDown',
   moveTo: 'moveTo',
@@ -37,6 +38,9 @@ const patchMethods = {
   },
   createUpdate: function (path, value, forceUpdate) {
     return createPatch(patchTypes.update, arguments);
+  },
+  createSet: function (path, value) {
+    return createPatch(patchTypes.set, arguments);
   },
   createMoveUp: function (path) {
     return createPatch(patchTypes.moveUp, arguments);
