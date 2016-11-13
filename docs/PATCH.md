@@ -5,6 +5,7 @@ Each [data processing methods](https://github.com/Jimmy-YMJ/jsonstore-js#data-pr
 - createAdd(path, value, key)
 - createRemove(path)
 - createUpdate(path, value, forceUpdate)
+- createSet(path, value)
 - createMoveUp(path)
 - createMoveDown(path)
 - createMoveTo(from, to, key)
