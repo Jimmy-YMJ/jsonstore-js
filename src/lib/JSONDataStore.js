@@ -187,15 +187,16 @@ JSONDataStore.prototype = {
     }
     return this;
   },
-  do: function (name, action, data) {
-    if(typeof name === 'function'){
-      data = action;
-      action = name;
-      name = '';
-    }
+  do: function (name, action, a, b, c, d, e, f) {
     var result = {};
     this.isDoing = true;
-    action(this, data, name);
+    if(typeof name === 'function'){
+      name(this, action, a, b, c, d, e, f);
+    }else if(typeof action === 'function'){
+      action(this, a, b, c, d, e, f);
+    }else {
+      throw new Error(`Invalid parameter action.`);
+    }
     // compose result
     result.patches = this.patches;
     result.relativePatches = this.relativePatches;
@@ -305,15 +306,15 @@ JSONDataStore.prototype = {
     }
     return this;
   },
-  extendObject: function (path, a, b, c, d, e) {
+  extendObject: function (path, a, b, c, d, e, f) {
     var ref;
     if(!(path = this._formatPath(path)) || utils.type(ref = this._getRef(path)) !== 'object') return this;
     if(this.isDoing){
       this.patches.push(patchMethods.createExtendObject.apply(this, arguments));
-      this.relativePatches.push(patchMethods.createExtendObject(this._getRelativePath(path), a, b, c, d, e));
+      this.relativePatches.push(patchMethods.createExtendObject(this._getRelativePath(path), a, b, c, d, e, f));
       this.backPatches.push(patchMethods.createUpdate(path, this.get(path)));
     }
-    object.extend(ref, a, b, c, d, e);
+    object.extend(ref, a, b, c, d, e, f);
     return this;
   },
   spreadArray: function (path, begin, infilling) {
