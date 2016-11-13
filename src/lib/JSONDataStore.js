@@ -261,6 +261,7 @@ JSONDataStore.prototype = {
     return this;
   },
   update: function (path, value, forceUpdate) {
+    path = this._formatPath(path, false);
     var lastKey, fullPath = this._getFullPath(path);
     if(fullPath){
       if(this.isDoing){
