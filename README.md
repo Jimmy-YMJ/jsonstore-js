@@ -176,7 +176,7 @@ All these methods return the sore itself.
 - [store.do([name,] action, data)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/DO.md)
 - [store.goTo(path, addUp)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/GOTO.md)
 - [store.applyPatch(patches)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/APPLYPATCH.md)
-- [store.patch.create*](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/PATCH.md)
+- [store.patch.create*(or JSONStore.patch.create*)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/PATCH.md)
 
 ## License
 MIT
