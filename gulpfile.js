@@ -6,12 +6,13 @@ const del = require('del');
 const browserify = require('browserify');
 const derequire = require('derequire');
 const fs = require('fs');
+const spawn = require('child_process').spawn;
 
 function minify(src) {
   return UglifyJS.minify(src, {fromString: true}).code;
 }
 
-function bundleMin(file, standalone, outputFile) {
+function bundleMin(file, standalone, outputFile, done) {
   var b = browserify({
     entries: file,
     standalone: standalone,
@@ -20,10 +21,11 @@ function bundleMin(file, standalone, outputFile) {
   b.bundle(function (err, buf) {
     var code = derequire(buf.toString(), '_dereq_', 'require');
     fs.writeFileSync(outputFile, minify(code));
+    done();
   });
 }
 
-function bundle(file, standalone, outputFile) {
+function bundle(file, standalone, outputFile, done) {
   var b = browserify({
     entries: file,
     standalone: standalone,
@@ -32,6 +34,7 @@ function bundle(file, standalone, outputFile) {
   b.bundle(function (err, buf) {
     var code = derequire(buf.toString(), '_dereq_', 'require');
     fs.writeFileSync(outputFile, code);
+    done();
   });
 }
 
@@ -39,22 +42,32 @@ gulp.task('clean', function () {
   return del('./build/**');
 });
 
-gulp.task('lib', ['clean'], function () {
+gulp.task('eslint', function () {
+  return gulp.src('./src/**').pipe(eslint());
+});
+
+gulp.task('lib', ['clean', 'eslint'], function () {
   return gulp.src('./src/**')
     .pipe(babel())
     .pipe(gulp.dest('./build/modules'));
 });
 
-gulp.task('build', ['lib'], function () {
-  bundle('./build/modules/store.js', 'JSONStore', './build/store.js');
-  bundleMin('./build/modules/store.js', "JSONStore", './build/store.min.js');
+gulp.task('bundle', ['lib'], function (cb) {
+  bundle('./build/modules/store.js', 'JSONStore', './build/store.js', cb);
 });
 
-gulp.task('eslint', function () {
-  return gulp.src('./src/**').pipe(eslint());
+gulp.task('bundle-min', ['lib'], function (cb) {
+  bundleMin('./build/modules/store.js', "JSONStore", './build/store.min.js', cb);
 });
 
-gulp.task('release', function () {
+gulp.task('test', ['bundle', 'bundle-min'], function (cb) {
+  const test = spawn('npm', ['run', 'test'], {stdio: "inherit"});
+  test.on('close', () => {
+    cb();
+  });
+});
+
+gulp.task('release', ['test'], function () {
   gulp.src([
     './build/modules/**',
     './package.json',
@@ -63,4 +76,4 @@ gulp.task('release', function () {
     .pipe(gulp.dest('./build/package'));
 });
 
-gulp.task('default', ['eslint', 'build']);
+gulp.task('default', ['test']);

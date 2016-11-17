@@ -43,7 +43,7 @@ var store = new JSONStore({
 });
 
 ```
-#### Traverse store and get data:
+#### Traverse the store and get data:
 ```javascript
 console.log(store.get( 'foo' )); // output: undefined
 console.log(store.get( 'name' )); // output: 'A store'
@@ -74,7 +74,7 @@ console.log(store.get( 'books' ));
 var results = store.do(functon(store, data){
     store.goTo(['books', {__value: {name: 'fruits'}}])
         .remove(['content', 0])
-        .update({__value: 'lemon'}, 'grape');
+        .update(['content', {__value: 'lemon'}], 'grape');
     console.log(store.get(['books', 1]));
     /**
     * The output is:
@@ -103,7 +103,7 @@ These can be done with **jsonstore-js** easily:
 var results = store.do(functon(store){
     store.goTo(['books', {__value: {id: 'book2'}}])
         .remove(['content', 0])
-        .update({__value: 'lemon'}, 'grape');
+        .update(['content', {__value: 'lemon'}], 'grape');
     console.log(store.get(['books', 1]));
     /**
     * The output is:
@@ -123,7 +123,7 @@ jQuery.ajax({
     }
   });
 
-// server side pseudo-codes
+// Server side pseudo codes
 var patches = request.body,
     book = getBookById('book2'),
     store = new JSONStore({store: book});
@@ -146,8 +146,8 @@ The `store.do` method executes and record store operations in it's `action` para
 
 | **Option** | **Description** | **type** | **default** |
 | --- | --- | --- | --- |
-| store | the data used to construct a store | any safe types | `undefined` |
-| copyStore | copy the **store** param | `Boolean` | `true` |
+| store | The data used to construct a store | Any safe types | `undefined` |
+| copyStore | Copy the **store** param | `Boolean` | `true` |
 
 ### About the `path` param:
 Param `path` used by methods is composed of **pathItem**s, it can be an array of **pathItem**s or just one **pathItem**. The **pathItem** can be two types: **key** and **value**, a **key** is the key of object or array, a **value** is an object like `{__value: 'bar'}` or `{__value: {foo: 'bar'}}`.
@@ -179,4 +179,4 @@ All these methods return the sore itself.
 - [store.patch.create*(or JSONStore.patch.create*)](https://github.com/Jimmy-YMJ/jsonstore-js/tree/master/docs/PATCH.md)
 
 ## License
-MIT
+[MIT](https://github.com/Jimmy-YMJ/jsonstore-js/blob/master/LICENSE)
