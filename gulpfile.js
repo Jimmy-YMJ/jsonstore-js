@@ -76,4 +76,11 @@ gulp.task('release', ['test'], function () {
     .pipe(gulp.dest('./build/package'));
 });
 
+gulp.task('publish', function (cb) {
+  const publish = spawn('npm', ['publish'], {cwd: "./build/package", stdio: "inherit"});
+  publish.on('close', () => {
+    cb();
+  });
+});
+
 gulp.task('default', ['test']);
