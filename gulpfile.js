@@ -62,9 +62,8 @@ gulp.task('bundle-min', ['lib'], function (cb) {
 
 gulp.task('test', ['bundle', 'bundle-min'], function (cb) {
   const test = spawn('npm', ['run', 'test'], {stdio: "inherit"});
-  test.on('close', () => {
-    cb();
-  });
+  test.on('close', () => { cb(); });
+  test.on('error', (err) => { cb(err); });
 });
 
 gulp.task('release', ['test'], function () {
@@ -78,9 +77,8 @@ gulp.task('release', ['test'], function () {
 
 gulp.task('publish', function (cb) {
   const publish = spawn('npm', ['publish'], {cwd: "./build/package", stdio: "inherit"});
-  publish.on('close', () => {
-    cb();
-  });
+  publish.on('close', () => { cb(); });
+  publish.on('error', (err) => { cb(err); });
 });
 
 gulp.task('default', ['test']);
