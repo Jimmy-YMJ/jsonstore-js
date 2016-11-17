@@ -2,8 +2,8 @@
 
 | **Param** | **Description** | **type** | **default** |
 | --- | --- | --- | --- |
-| name | The name of this 'do' action, it will be passed to `action` as `name` param and it's optional, | `String` | `''`|
-| action  | A callback which will be executed by passing a store , `data` and `name`. | `Function` | `undefined` |
+| name | The name of this 'do' action, it is designed to debugging, but temporarily not used. | `String` | `''`|
+| action  | A callback which will be executed by passing a `store` and `a`, `b`, `c`, `d`, `e`, `f`. | `Function` | `undefined` |
 | a, b, c, d, e, f | These will be passed to `action` as parameters. | any | `undefined`|
 
 This method executes and record store operations in it's `action` param. The value returned by `store.do` is an object like:
@@ -32,7 +32,7 @@ var store = new JSONStore({
 var action = function(store, foo, bar){
     store.goTo(['books', {__value: {id: 'book2'}}])
         .remove(['content', 0])
-        .update({__value: 'lemon'}, 'grape');
+        .update(['content', {__value: 'lemon'}], 'grape');
             
     console.log(foo);
     console.log(bar);
