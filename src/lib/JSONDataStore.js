@@ -104,9 +104,16 @@ JSONDataStore.prototype = {
     return this;
   },
   _getFullPath: function (path) {
+    if(utils.isReferenceType(path) && path.isFull){
+      return path;
+    }
     var currentPath = this._formatPath(this.currentPath, false),
-      fullPath = currentPath.concat(this._formatPath(path, false));
-    return this._formatPath(fullPath);
+      fullPath = currentPath.concat(this._formatPath(path, false)),
+      formattedFullPath = this._formatPath(fullPath);
+    if(formattedFullPath){
+      formattedFullPath.isFull = true;
+    }
+    return formattedFullPath;
   },
   _getRelativePath: function (fullPath) {
     return fullPath.slice(this.currentPath.length);
