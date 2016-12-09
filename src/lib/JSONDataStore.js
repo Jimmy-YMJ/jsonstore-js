@@ -308,7 +308,9 @@ JSONDataStore.prototype = {
       return copy === false ? this._getRef(path) : utils.copy(this._getRef(path));
     }
   },
-  patch: patchMethods,
+  patch: function () {
+    throw new Error('This method is deprecated, use JSONStore.patch instead.');
+  },
   applyPatch: function (patches) {
     patches = utils.type(patches) === 'array' ? patches : [patches];
     patches.forEach(function (patch) {
@@ -318,6 +320,6 @@ JSONDataStore.prototype = {
   }
 };
 
-JSONDataStore.patch = patchMethods;
+JSONDataStore.Patch = patchMethods;
 
 module.exports = JSONDataStore;
