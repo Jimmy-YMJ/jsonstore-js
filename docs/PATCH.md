@@ -1,4 +1,4 @@
-# store.patch.create* or JSONStore.patch.create*
+# JSONStore.patch.create*
 
 Each [data processing methods](https://github.com/Jimmy-YMJ/jsonstore-js#data-processing-methods) has a corresponding patch creator, and they accept the same params.
 
