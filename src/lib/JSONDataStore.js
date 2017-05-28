@@ -10,6 +10,8 @@ const utils = require('./utils');
 const array = require('./array');
 const object = require('./object');
 const patchMethods = require('./patch');
+const JSON_STORE_CACHE_KEY_PREFIX = 'JSON_STORE_CACHE_KEY_PREFIX';
+const emptyFunc = () => {};
 
 function JSONDataStore(options) {
   options = options || {};
@@ -17,6 +19,7 @@ function JSONDataStore(options) {
   var store = options.store, copyStore = options.copyStore !== false;
   this.store = copyStore ? utils.copy(store) : store;
   this.cacheKeys = this._getCacheKeysMap(options);
+  this.cacheKeyPrefix = options.cacheKeyPrefix || JSON_STORE_CACHE_KEY_PREFIX;
   this.localStorage = options.localStorage;
   // 'do' about attributes
   this.patches = [];
@@ -140,18 +143,27 @@ JSONDataStore.prototype = {
   _getRelativePath: function (fullPath) {
     return fullPath.slice(this.currentPath.length);
   },
+  _composeCacheKey: function (key) {
+    return this.cacheKeyPrefix + key;
+  },
   _updateCache: function (key) {
-    if(this.cacheKeys[key]){
-      localStorage.setItem(key, this.get(key));
+    if(this.cacheKeys[key] && this.localStorage && typeof this.localStorage.setItem === 'function'){
+      this.localStorage.setItem(this._composeCacheKey(key), this.get(key));
     }
   },
-  loadCache: function (success) {
-    localStorage.getAll(cache => {
-      Object.keys(this.store).forEach(key => {
-        this.set(key, cache[key]);
-      });
-      success(cache);
-    })
+  loadCache: function (success, error) {
+    error = typeof error === 'function' ? error : emptyFunc;
+    if(this.localStorage && typeof this.localStorage.multiGet === 'function'){
+      let cacheKeys = this.initialOptions.cacheKeys;
+      this.localStorage.multiGet(cacheKeys.map(key => this._composeCacheKey(key)), cache => {
+        cacheKeys.forEach(key => {
+          this.set(key, cache[key]);
+        });
+        success();
+      }, error);
+    }else{
+      error('localStorage is undefined');
+    }
   },
   reInit: function (options) {
     JSONDataStore.call(this, options || this.initialOptions);
