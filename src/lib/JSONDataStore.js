@@ -159,7 +159,7 @@ JSONDataStore.prototype = {
         cacheKeys.forEach(key => {
           this.set(key, cache[key]);
         });
-        success();
+        success(cache);
       }, error);
     }else{
       error('localStorage is undefined');
