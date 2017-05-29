@@ -144,7 +144,7 @@ JSONDataStore.prototype = {
     return fullPath.slice(this.currentPath.length);
   },
   _composeCacheKey: function (key) {
-    return this.cacheKeyPrefix + key;
+    return this.cacheKeyPrefix + '@' + key;
   },
   _updateCache: function (key) {
     if(this.cacheKeys[key] && this.localStorage && typeof this.localStorage.setItem === 'function'){
@@ -154,12 +154,16 @@ JSONDataStore.prototype = {
   loadCache: function (success, error) {
     error = typeof error === 'function' ? error : emptyFunc;
     if(this.localStorage && typeof this.localStorage.multiGet === 'function'){
-      let cacheKeys = this.initialOptions.cacheKeys;
-      this.localStorage.multiGet(cacheKeys.map(key => this._composeCacheKey(key)), cache => {
-        cacheKeys.forEach(key => {
-          this.set(key, cache[key]);
+      let cacheKeys = this.initialOptions.cacheKeys || [];
+      let composedKeys = cacheKeys.map(key => this._composeCacheKey(key));
+      this.localStorage.multiGet(composedKeys, cache => {
+        let parsedCache = {};
+        composedKeys.forEach((composedKey, index) => {
+          let key = cacheKeys[index];
+          this.set(key, cache[composedKey]);
+          parsedCache[key] = cache[composedKey];
         });
-        success(cache);
+        success(parsedCache);
       }, error);
     }else{
       error('localStorage is undefined');
