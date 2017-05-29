@@ -270,12 +270,12 @@ JSONDataStore.prototype = {
       }else{
         this.store = value;
       }
+      this._updateCache(path[0]);
       return this;
     }else if(forceUpdate === true && path.length > 0){
       lastKey = path.pop();
       return this.add(path, value, lastKey);
     }
-    this._updateCache(path[0]);
     return this;
   },
   set: function (path, value) {
