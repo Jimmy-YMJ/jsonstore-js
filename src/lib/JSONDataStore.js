@@ -160,7 +160,8 @@ JSONDataStore.prototype = {
         let parsedCache = {};
         composedKeys.forEach((composedKey, index) => {
           let key = cacheKeys[index];
-          this.set(key, cache[composedKey]);
+          let cachedValue = cache[composedKey];
+          this.set(key, cachedValue === null ? this.get(key) : cachedValue);
           parsedCache[key] = cache[composedKey];
         });
         success(parsedCache);
