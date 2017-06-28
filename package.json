@@ -19,17 +19,15 @@
   },
   "author": "Jimmy-YMJ",
   "license": "MIT",
-  "dependencies": {
-    "gulp": "^3.9.1"
-  },
   "devDependencies": {
-    "babel-preset-es2015": "^6.18.0",
-    "browserify": "^13.1.1",
-    "del": "^2.2.2",
-    "derequire": "^2.0.3",
-    "gulp-babel": "^6.1.2",
-    "gulp-eslint": "^3.0.1",
-    "jest": "^16.0.2",
-    "uglify-js": "^2.7.4"
+    "gulp": "3.9.1",
+    "babel-preset-es2015": "6.18.0",
+    "browserify": "13.1.1",
+    "del": "2.2.2",
+    "derequire": "2.0.3",
+    "gulp-babel": "6.1.2",
+    "gulp-eslint": "3.0.1",
+    "jest": "16.0.2",
+    "uglify-js": "2.7.4"
   }
 }
