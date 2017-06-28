@@ -10,6 +10,7 @@ const utils = require('./utils');
 const array = require('./array');
 const object = require('./object');
 const patchMethods = require('./patch');
+const PathListener = require('./PathListener');
 const JSON_STORE_CACHE_KEY_PREFIX = 'JSON_STORE_CACHE_KEY_PREFIX';
 const emptyFunc = () => {};
 
@@ -27,9 +28,14 @@ function JSONDataStore(options) {
   this.backPatches = [];
   this.currentPath = [];
   this.isDoing = false;
+  this.pathListener = new PathListener();
 }
 
 JSONDataStore.prototype = {
+  _storeUpdated: function (path) {
+    this._updateCache(path[0]);
+    this.pathListener.checkPath(path, this.store);
+  },
   _getCacheKeysMap: function (options) {
     let cacheKeysMap = {};
     if(utils.type(options.cacheKeys) === 'array'){
@@ -125,7 +131,7 @@ JSONDataStore.prototype = {
     }else {
       array.moveArrayItemDown(arr, itemIndex);
     }
-    this._updateCache(path[0]);
+    this._storeUpdated(path);
     return this;
   },
   _getFullPath: function (path) {
@@ -150,6 +156,15 @@ JSONDataStore.prototype = {
     if(this.cacheKeys[key] && this.localStorage && typeof this.localStorage.setItem === 'function'){
       this.localStorage.setItem(this._composeCacheKey(key), this.get(key));
     }
+  },
+  registerPathListener: function (path, callback, group) {
+    this.pathListener.registerListener(path, callback, group);
+  },
+  removeListenerByPath: function (path, cb) {
+    this.pathListener.removeListenerByPath(path, cb);
+  },
+  removeListenerByGroup: function (group) {
+    this.pathListener.removeListenerByGroup(group);
   },
   loadCache: function (success, error) {
     error = typeof error === 'function' ? error : emptyFunc;
@@ -233,7 +248,7 @@ JSONDataStore.prototype = {
         ref.push(value);
       }
     }
-    this._updateCache(path[0]);
+    this._storeUpdated(path);
     return this;
   },
   remove: function (path) {
@@ -253,7 +268,7 @@ JSONDataStore.prototype = {
     }else if (refType === 'object') {
       delete ref[lastKey];
     }
-    this._updateCache(path[0]);
+    this._storeUpdated(path);
     return this;
   },
   update: function (path, value, forceUpdate) {
@@ -271,7 +286,7 @@ JSONDataStore.prototype = {
       }else{
         this.store = value;
       }
-      this._updateCache(path[0]);
+      this._storeUpdated(path);
       return this;
     }else if(forceUpdate === true && path.length > 0){
       lastKey = path.pop();
@@ -316,7 +331,7 @@ JSONDataStore.prototype = {
       this.backPatches.push(patchMethods.createUpdate(path, this.get(path)));
     }
     object.extend(ref, a, b, c, d, e, f);
-    this._updateCache(path[0]);
+    this._storeUpdated(path);
     return this;
   },
   spreadArray: function (path, begin, infilling, simpleInfilling, count) {
@@ -332,7 +347,7 @@ JSONDataStore.prototype = {
       this.backPatches.unshift(patchMethods.createUpdate(path, this.get(path)));
     }
     array.spreadArray(ref, begin, infilling, simpleInfilling, count);
-    this._updateCache(path[0]);
+    this._storeUpdated(path);
     return this;
   },
   spread2dArrayRow: function (path, begin, rows, simpleInfilling, count) {
@@ -349,7 +364,7 @@ JSONDataStore.prototype = {
       this.backPatches.unshift(patchMethods.createUpdate(path, this.get(path)));
     }
     array.spread2dArrayRow(ref, begin, rows, simpleInfilling, count);
-    this._updateCache(path[0]);
+    this._storeUpdated(path);
     return this;
   },
   spread2dArrayCol: function (path, begin, cols, simpleInfilling, count) {
@@ -366,7 +381,7 @@ JSONDataStore.prototype = {
       this.backPatches.unshift(patchMethods.createUpdate(path, this.get(path)));
     }
     array.spread2dArrayCol(ref, begin, cols, simpleInfilling, count);
-    this._updateCache(path[0]);
+    this._storeUpdated(path);
     return this;
   },
   get: function (path, copy) {
