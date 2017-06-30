@@ -17,7 +17,7 @@ const emptyFunc = () => {};
 function JSONDataStore(options) {
   options = options || {};
   this.initialOptions = utils.copy(options);
-  var store = options.store, copyStore = options.copyStore !== false;
+  let store = options.store, copyStore = options.copyStore !== false;
   this.store = copyStore ? utils.copy(store) : store;
   this.cacheKeys = this._getCacheKeysMap(options);
   this.cacheKeyPrefix = options.cacheKeyPrefix || JSON_STORE_CACHE_KEY_PREFIX;
@@ -29,12 +29,13 @@ function JSONDataStore(options) {
   this.currentPath = [];
   this.isDoing = false;
   this.pathListener = new PathListener();
+  this.initialMutationActionPath = [];
 }
 
 JSONDataStore.prototype = {
-  _storeUpdated: function (path) {
-    this._updateCache(path[0]);
-    this.pathListener.checkPath(path, this.store);
+  _storeUpdated: function () {
+    this._updateCache(this.initialMutationActionPath[0]);
+    this.pathListener.checkPath(this.initialMutationActionPath, this.store);
   },
   _getCacheKeysMap: function (options) {
     let cacheKeysMap = {};
@@ -48,21 +49,21 @@ JSONDataStore.prototype = {
     return cacheKeysMap;
   },
   _getRef: function (path) {
-    var ref = this.store, i = 0, len = path.length;
+    let ref = this.store, i = 0, len = path.length;
     for(; i < len; i ++){
       ref = ref[path[i]];
     }
     return ref;
   },
   _detectPath: function (path) {
-    var detected = [], ref = this.store, i = 0, len = path.length, key, keyType, refType;
+    let detected = [], ref = this.store, i = 0, len = path.length, key, keyType, refType;
     for(; i < len; i ++){
       key = path[i];
       keyType = utils.type(key);
       refType = utils.type(ref);
       if(refType === 'object'){
         if(object.hasOwnProperty.call(key, '__value')){
-          var objKey = object.getObjectKeyByValue(ref, key.__value);
+          let objKey = object.getObjectKeyByValue(ref, key.__value);
           if(objKey){
             ref = ref[objKey];
             detected.push(objKey);
@@ -77,7 +78,7 @@ JSONDataStore.prototype = {
         }
       }else if(refType === 'array'){
         if(object.hasOwnProperty.call(key, '__value')){
-          var index = array.getArrayIndexByValue(ref, key.__value);
+          let index = array.getArrayIndexByValue(ref, key.__value);
           if(index > -1){
             ref = ref[index];
             detected.push(index);
@@ -95,28 +96,28 @@ JSONDataStore.prototype = {
     return detected;
   },
   _formatPath: function (path, detect) {
-    var pathType = utils.type(path);
+    let pathType = utils.type(path);
     if(pathType === 'undefined' || pathType === 'null'){
       path = [];
     }else if(pathType !== 'array'){
       path = [path];
     }
     if(detect !== false){
-      var detected = this._detectPath(path);
+      let detected = this._detectPath(path);
       if(detected.length === path.length){
         return detected;
       }
       return null;
     }
-    return path;
+    return path.slice();
   },
   _moveArrayItem: function (path, moveUp) {
-    var fullPath = this._getFullPath(path);
+    let fullPath = this._getFullPath(path);
     if(!fullPath || fullPath.length < 1) return this;
-    var itemIndex = fullPath.pop(),
+    let itemIndex = fullPath.pop(),
       arr = this._getRef(fullPath);
     if(utils.type(arr) !== 'array') return this;
-    var method = moveUp === true ? 'createMoveUp' : 'createMoveDown',
+    let method = moveUp === true ? 'createMoveUp' : 'createMoveDown',
       reverseMethod = method === 'createMoveUp' ? 'createMoveDown' : 'createMoveUp';
     if(this.isDoing){
       this.patches.push(patchMethods[method](fullPath.concat(itemIndex)));
@@ -131,14 +132,14 @@ JSONDataStore.prototype = {
     }else {
       array.moveArrayItemDown(arr, itemIndex);
     }
-    this._storeUpdated(path);
+    this._storeUpdated();
     return this;
   },
   _getFullPath: function (path) {
     if(utils.isReferenceType(path) && path.isFull){
       return path;
     }
-    var currentPath = this._formatPath(this.currentPath, false),
+    let currentPath = this._formatPath(this.currentPath, false),
       fullPath = currentPath.concat(this._formatPath(path, false)),
       formattedFullPath = this._formatPath(fullPath);
     if(formattedFullPath){
@@ -201,7 +202,7 @@ JSONDataStore.prototype = {
     return this;
   },
   do: function (name, action, a, b, c, d, e, f) {
-    var result = {};
+    let result = {};
     this.isDoing = true;
     if(typeof name === 'function'){
       name(this, action, a, b, c, d, e, f);
@@ -222,8 +223,9 @@ JSONDataStore.prototype = {
     this.isDoing = false;
     return result;
   },
-  add: function (path, value, key) {
-    var ref, refType;
+  add: function (path, value, key, parentPath) {
+    this.initialMutationActionPath = parentPath !== undefined ? parentPath : this._formatPath(path);
+    let ref, refType;
     path = this._getFullPath(path);
     if(!path || !utils.isReferenceType(ref = this._getRef(path))
       || ((refType = utils.type(ref)) === 'object' && !utils.isCommonKeyType(key))){
@@ -241,17 +243,18 @@ JSONDataStore.prototype = {
     if (refType === 'object') {
       ref[key] = value;
     }else{
-      var index = array.parseArrayIndex(key);
+      let index = array.parseArrayIndex(key);
       if (index !== undefined) {
         ref.splice(index, 0, value);
       } else {
         ref.push(value);
       }
     }
-    this._storeUpdated(path);
+    this._storeUpdated();
     return this;
   },
-  remove: function (path) {
+  remove: function (path, parentPath) {
+    this.initialMutationActionPath = parentPath !== undefined ? parentPath : this._formatPath(path);
     if(!(path = this._getFullPath(path))) return this;
     if(this.isDoing){
       this.patches.push(patchMethods.createRemove(path));
@@ -262,18 +265,19 @@ JSONDataStore.prototype = {
       this.store = undefined;
       return this;
     }
-    var lastKey = path.pop(), ref = this._getRef(path), refType = utils.type(ref);
+    let lastKey = path.pop(), ref = this._getRef(path), refType = utils.type(ref);
     if (refType === 'array') {
       ref.splice(lastKey, 1);
     }else if (refType === 'object') {
       delete ref[lastKey];
     }
-    this._storeUpdated(path);
+    this._storeUpdated();
     return this;
   },
-  update: function (path, value, forceUpdate) {
+  update: function (path, value, forceUpdate, parentPath) {
+    this.initialMutationActionPath = parentPath !== undefined ? parentPath : this._formatPath(path);
     path = this._formatPath(path, false);
-    var lastKey, fullPath = this._getFullPath(path);
+    let lastKey, fullPath = this._getFullPath(path);
     if(fullPath){
       if(this.isDoing){
         this.patches.push(patchMethods.createUpdate(fullPath, value));
@@ -286,44 +290,51 @@ JSONDataStore.prototype = {
       }else{
         this.store = value;
       }
-      this._storeUpdated(path);
+      this._storeUpdated();
       return this;
     }else if(forceUpdate === true && path.length > 0){
       lastKey = path.pop();
-      return this.add(path, value, lastKey);
+      return this.add(path, value, lastKey, this.initialMutationActionPath);
     }
     return this;
   },
   set: function (path, value) {
-    return this.update(path, value, true);
+    return this.update(path, value, true, this._formatPath(path));
   },
   moveUp: function (path) {
+    this.initialMutationActionPath = parentPath !== undefined ? parentPath : this._formatPath(path);
     return this._moveArrayItem(path, true);
   },
   moveDown: function (path) {
+    this.initialMutationActionPath = parentPath !== undefined ? parentPath : this._formatPath(path);
     return this._moveArrayItem(path);
   },
   moveTo: function (from, to, key) {
+    let parentFromPath = this._formatPath(from),
+      parentToPath = this._formatPath(to);
     from = this._getFullPath(from);
     to = this._getFullPath(to);
     if(!from || !to || !utils.isReferenceType(this._getRef(to))) return this;
-    this.add(to, this._getRef(from), key);
-    this.remove(from);
+    this.add(to, this._getRef(from), key, parentToPath);
+    this.remove(from, parentFromPath);
     return this;
   },
   exchange: function (from, to) {
+    let parentFromPath = this._formatPath(from),
+      parentToPath = this._formatPath(to);
     from = this._getFullPath(from);
     to = this._getFullPath(to);
     if(from && to){
-      var fromRef = this._getRef(from),
+      let fromRef = this._getRef(from),
         toRef = this.get(to);
-      this.update(from, toRef);
-      this.update(to, fromRef);
+      this.update(from, toRef, false, parentFromPath);
+      this.update(to, fromRef, false, parentToPath);
     }
     return this;
   },
   extendObject: function (path, a, b, c, d, e, f) {
-    var ref;
+    this.initialMutationActionPath = parentPath !== undefined ? parentPath : this._formatPath(path);
+    let ref;
     if(!(path = this._getFullPath(path)) || utils.type(ref = this._getRef(path)) !== 'object') return this;
     if(this.isDoing){
       this.patches.push(patchMethods.createExtendObject.apply(this, arguments));
@@ -331,11 +342,12 @@ JSONDataStore.prototype = {
       this.backPatches.push(patchMethods.createUpdate(path, this.get(path)));
     }
     object.extend(ref, a, b, c, d, e, f);
-    this._storeUpdated(path);
+    this._storeUpdated();
     return this;
   },
   spreadArray: function (path, begin, infilling, simpleInfilling, count) {
-    var ref;
+    this.initialMutationActionPath = parentPath !== undefined ? parentPath : this._formatPath(path);
+    let ref;
     if(!(path = this._getFullPath(path)) || utils.type(ref = this._getRef(path)) !== 'array'){
       return this;
     }
@@ -347,11 +359,12 @@ JSONDataStore.prototype = {
       this.backPatches.unshift(patchMethods.createUpdate(path, this.get(path)));
     }
     array.spreadArray(ref, begin, infilling, simpleInfilling, count);
-    this._storeUpdated(path);
+    this._storeUpdated();
     return this;
   },
   spread2dArrayRow: function (path, begin, rows, simpleInfilling, count) {
-    var ref;
+    this.initialMutationActionPath = parentPath !== undefined ? parentPath : this._formatPath(path);
+    let ref;
     if(!(path = this._getFullPath(path)) || !array.is2dArray(ref = this._getRef(path))
       || !(utils.type(begin) === 'number')){
       return this;
@@ -364,11 +377,12 @@ JSONDataStore.prototype = {
       this.backPatches.unshift(patchMethods.createUpdate(path, this.get(path)));
     }
     array.spread2dArrayRow(ref, begin, rows, simpleInfilling, count);
-    this._storeUpdated(path);
+    this._storeUpdated();
     return this;
   },
   spread2dArrayCol: function (path, begin, cols, simpleInfilling, count) {
-    var ref;
+    this.initialMutationActionPath = parentPath !== undefined ? parentPath : this._formatPath(path);
+    let ref;
     if(!(path = this._getFullPath(path)) || !array.is2dArray(ref = this._getRef(path))
       || !(utils.type(begin) === 'number')){
       return this;
@@ -381,7 +395,7 @@ JSONDataStore.prototype = {
       this.backPatches.unshift(patchMethods.createUpdate(path, this.get(path)));
     }
     array.spread2dArrayCol(ref, begin, cols, simpleInfilling, count);
-    this._storeUpdated(path);
+    this._storeUpdated();
     return this;
   },
   get: function (path, copy) {
