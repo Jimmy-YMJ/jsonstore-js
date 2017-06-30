@@ -224,7 +224,7 @@ JSONDataStore.prototype = {
     return result;
   },
   add: function (path, value, key, parentPath) {
-    this.initialMutationActionPath = parentPath !== undefined ? parentPath : this._formatPath(path);
+    this.initialMutationActionPath = parentPath !== undefined ? parentPath : this._formatPath(path, false);
     let ref, refType;
     path = this._getFullPath(path);
     if(!path || !utils.isReferenceType(ref = this._getRef(path))
@@ -254,7 +254,7 @@ JSONDataStore.prototype = {
     return this;
   },
   remove: function (path, parentPath) {
-    this.initialMutationActionPath = parentPath !== undefined ? parentPath : this._formatPath(path);
+    this.initialMutationActionPath = parentPath !== undefined ? parentPath : this._formatPath(path, false);
     if(!(path = this._getFullPath(path))) return this;
     if(this.isDoing){
       this.patches.push(patchMethods.createRemove(path));
@@ -275,7 +275,7 @@ JSONDataStore.prototype = {
     return this;
   },
   update: function (path, value, forceUpdate, parentPath) {
-    this.initialMutationActionPath = parentPath !== undefined ? parentPath : this._formatPath(path);
+    this.initialMutationActionPath = parentPath !== undefined ? parentPath : this._formatPath(path, false);
     path = this._formatPath(path, false);
     let lastKey, fullPath = this._getFullPath(path);
     if(fullPath){
@@ -299,19 +299,19 @@ JSONDataStore.prototype = {
     return this;
   },
   set: function (path, value) {
-    return this.update(path, value, true, this._formatPath(path));
+    return this.update(path, value, true, this._formatPath(path, false));
   },
   moveUp: function (path) {
-    this.initialMutationActionPath = parentPath !== undefined ? parentPath : this._formatPath(path);
+    this.initialMutationActionPath = this._formatPath(path, false);
     return this._moveArrayItem(path, true);
   },
   moveDown: function (path) {
-    this.initialMutationActionPath = parentPath !== undefined ? parentPath : this._formatPath(path);
+    this.initialMutationActionPath = this._formatPath(path, false);
     return this._moveArrayItem(path);
   },
   moveTo: function (from, to, key) {
-    let parentFromPath = this._formatPath(from),
-      parentToPath = this._formatPath(to);
+    let parentFromPath = this._formatPath(from, false),
+      parentToPath = this._formatPath(to, false);
     from = this._getFullPath(from);
     to = this._getFullPath(to);
     if(!from || !to || !utils.isReferenceType(this._getRef(to))) return this;
@@ -320,8 +320,8 @@ JSONDataStore.prototype = {
     return this;
   },
   exchange: function (from, to) {
-    let parentFromPath = this._formatPath(from),
-      parentToPath = this._formatPath(to);
+    let parentFromPath = this._formatPath(from, false),
+      parentToPath = this._formatPath(to, false);
     from = this._getFullPath(from);
     to = this._getFullPath(to);
     if(from && to){
@@ -333,7 +333,7 @@ JSONDataStore.prototype = {
     return this;
   },
   extendObject: function (path, a, b, c, d, e, f) {
-    this.initialMutationActionPath = parentPath !== undefined ? parentPath : this._formatPath(path);
+    this.initialMutationActionPath = this._formatPath(path, false);
     let ref;
     if(!(path = this._getFullPath(path)) || utils.type(ref = this._getRef(path)) !== 'object') return this;
     if(this.isDoing){
@@ -346,7 +346,7 @@ JSONDataStore.prototype = {
     return this;
   },
   spreadArray: function (path, begin, infilling, simpleInfilling, count) {
-    this.initialMutationActionPath = parentPath !== undefined ? parentPath : this._formatPath(path);
+    this.initialMutationActionPath = this._formatPath(path, false);
     let ref;
     if(!(path = this._getFullPath(path)) || utils.type(ref = this._getRef(path)) !== 'array'){
       return this;
@@ -363,7 +363,7 @@ JSONDataStore.prototype = {
     return this;
   },
   spread2dArrayRow: function (path, begin, rows, simpleInfilling, count) {
-    this.initialMutationActionPath = parentPath !== undefined ? parentPath : this._formatPath(path);
+    this.initialMutationActionPath = this._formatPath(path, false);
     let ref;
     if(!(path = this._getFullPath(path)) || !array.is2dArray(ref = this._getRef(path))
       || !(utils.type(begin) === 'number')){
@@ -381,7 +381,7 @@ JSONDataStore.prototype = {
     return this;
   },
   spread2dArrayCol: function (path, begin, cols, simpleInfilling, count) {
-    this.initialMutationActionPath = parentPath !== undefined ? parentPath : this._formatPath(path);
+    this.initialMutationActionPath = this._formatPath(path, false);
     let ref;
     if(!(path = this._getFullPath(path)) || !array.is2dArray(ref = this._getRef(path))
       || !(utils.type(begin) === 'number')){
