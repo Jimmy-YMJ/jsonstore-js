@@ -28,14 +28,14 @@ function JSONDataStore(options) {
   this.backPatches = [];
   this.currentPath = [];
   this.isDoing = false;
-  this.pathListener = new PathListener();
+  this.pathListener = new PathListener({ store: this.store });
   this.initialMutationActionPath = [];
 }
 
 JSONDataStore.prototype = {
   _storeUpdated: function () {
     this._updateCache(this.initialMutationActionPath[0]);
-    this.pathListener.checkPath(this.initialMutationActionPath, this.store);
+    this.pathListener.checkPath(this.initialMutationActionPath);
   },
   _getCacheKeysMap: function (options) {
     let cacheKeysMap = {};
@@ -166,6 +166,9 @@ JSONDataStore.prototype = {
   },
   removeListenerByGroup: function (group) {
     this.pathListener.removeListenerByGroup(group);
+  },
+  removeAllListeners: function () {
+    this.pathListener.removeAllListeners();
   },
   loadCache: function (success, error) {
     error = typeof error === 'function' ? error : emptyFunc;

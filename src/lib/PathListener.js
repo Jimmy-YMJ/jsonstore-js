@@ -3,6 +3,7 @@ function PathListener(options) {
   this.deepEqual = options.deepEqual === true;
   this.listenerTree = {};
   this.groupRefs = {};
+  this.store = options.store || {};
 }
 
 PathListener.prototype = {
@@ -36,9 +37,12 @@ PathListener.prototype = {
       }
       this.groupRefs[group].push([treeRef.listeners, listenerIndex]);
     }
+    if(group === true){
+      this.checkPath(path);
+    }
   },
-  checkPath: function (path, store) {
-    let i = 0, len = path.length, pathItem, treeRef = this.listenerTree, dataRef = store;
+  checkPath: function (path) {
+    let i = 0, len = path.length, pathItem, treeRef = this.listenerTree, dataRef = this.store;
     while (i < len){
       if(dataRef === undefined) break;
       pathItem = path[i ++];
@@ -52,6 +56,11 @@ PathListener.prototype = {
       }
       treeRef = treeRef[pathItem].children;
     }
+
+  },
+  removeAllListeners: function () {
+    this.listenerTree = {};
+    this.groupRefs = {};
   },
   removeListenerByPath: function (path, cb) {
     if(typeof cb !== 'function') return void 0;
