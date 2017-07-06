@@ -18,6 +18,7 @@ function JSONDataStore(options) {
   options = options || {};
   this.initialOptions = utils.copy(options);
   let store = options.store, copyStore = options.copyStore !== false;
+  this.copyStore = copyStore;
   this.store = copyStore ? utils.copy(store) : store;
   this.cacheKeys = this._getCacheKeysMap(options);
   this.cacheKeyPrefix = options.cacheKeyPrefix || JSON_STORE_CACHE_KEY_PREFIX;
@@ -28,7 +29,7 @@ function JSONDataStore(options) {
   this.backPatches = [];
   this.currentPath = [];
   this.isDoing = false;
-  this.pathListener = new PathListener({ store: this.store });
+  this.pathListener = new PathListener({ store: this.store, copyStore: copyStore });
   this.initialMutationActionPath = [];
 }
 
@@ -401,9 +402,9 @@ JSONDataStore.prototype = {
     this._storeUpdated();
     return this;
   },
-  get: function (path, copy) {
+  get: function (path) {
     if(path = this._getFullPath(path)){
-      return copy === false ? this._getRef(path) : utils.copy(this._getRef(path));
+      return this.copyStore ? utils.copy(this._getRef(path)) : this._getRef(path);
     }
   },
   patch: function () {

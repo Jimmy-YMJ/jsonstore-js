@@ -1,6 +1,7 @@
 function PathListener(options) {
   options = options || {};
   this.deepEqual = options.deepEqual === true;
+  this.copyStore = options.copyStore;
   this.listenerTree = {};
   this.groupRefs = {};
   this.store = options.store || {};
@@ -9,7 +10,7 @@ function PathListener(options) {
 PathListener.prototype = {
   _copyData: function (data) {
     if(data === undefined) return data;
-    return JSON.parse(JSON.stringify(data));
+    return this.copyStore ? JSON.parse(JSON.stringify(data)) : data;
   },
   _removeListener: function (listeners, cb) {
     let i = 0, len = listeners.length;
