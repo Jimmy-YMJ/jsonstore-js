@@ -160,10 +160,12 @@ JSONDataStore.prototype = {
     }
   },
   registerPathListener: function (path, callback, group) {
+    path = Array.isArray(path) ? path : [path];
     this.pathListener.registerListener(path, callback, group);
   },
-  removeListenerByPath: function (path, cb) {
-    this.pathListener.removeListenerByPath(path, cb);
+  removeListenerByPath: function (path, callback) {
+    path = Array.isArray(path) ? path : [path];
+    this.pathListener.removeListenerByPath(path, callback);
   },
   removeListenerByGroup: function (group) {
     this.pathListener.removeListenerByGroup(group);
