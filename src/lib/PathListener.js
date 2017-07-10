@@ -5,6 +5,7 @@ function PathListener(options) {
   this.listenerTree = {};
   this.groupRefs = {};
   this.store = options.store || {};
+  this.flashKeys = options.flashKeys || {};
 }
 
 PathListener.prototype = {
@@ -57,7 +58,9 @@ PathListener.prototype = {
       }
       treeRef = treeRef[pathItem].children;
     }
-
+    if(path.length === 1 && this.flashKeys[path[0]]){
+      this.store[path[0]] = null;
+    }
   },
   removeAllListeners: function () {
     this.listenerTree = {};

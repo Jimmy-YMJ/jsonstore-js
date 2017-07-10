@@ -20,7 +20,8 @@ function JSONDataStore(options) {
   let store = options.store, copyStore = options.copyStore !== false;
   this.copyStore = copyStore;
   this.store = copyStore ? utils.copy(store) : store;
-  this.cacheKeys = this._getCacheKeysMap(options);
+  this.cacheKeys = this._getStoreKeysMap(options.cacheKeys, this.store);
+  this.flashKeys = this._getStoreKeysMap(options.flashKeys, this.store);
   this.cacheKeyPrefix = options.cacheKeyPrefix || JSON_STORE_CACHE_KEY_PREFIX;
   this.localStorage = options.localStorage;
   // 'do' about attributes
@@ -29,7 +30,7 @@ function JSONDataStore(options) {
   this.backPatches = [];
   this.currentPath = [];
   this.isDoing = false;
-  this.pathListener = new PathListener({ store: this.store, copyStore: copyStore });
+  this.pathListener = new PathListener({ store: this.store, copyStore: copyStore, flashKeys: this.flashKeys });
   this.initialMutationActionPath = [];
 }
 
@@ -38,16 +39,16 @@ JSONDataStore.prototype = {
     this._updateCache(this.initialMutationActionPath[0]);
     this.pathListener.checkPath(this.initialMutationActionPath);
   },
-  _getCacheKeysMap: function (options) {
-    let cacheKeysMap = {};
-    if(utils.type(options.cacheKeys) === 'array'){
-      options.cacheKeys.forEach(key => {
-        if(Object.hasOwnProperty.call(options.store, key)){
-          cacheKeysMap[key] = true;
+  _getStoreKeysMap: function (keys, store) {
+    let keysMap = {};
+    if(utils.type(keys) === 'array'){
+      keys.forEach(key => {
+        if(Object.hasOwnProperty.call(store, key)){
+          keysMap[key] = true;
         }
       })
     }
-    return cacheKeysMap;
+    return keysMap;
   },
   _getRef: function (path) {
     let ref = this.store, i = 0, len = path.length;
