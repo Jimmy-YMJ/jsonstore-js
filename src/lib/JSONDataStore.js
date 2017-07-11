@@ -160,9 +160,9 @@ JSONDataStore.prototype = {
       this.localStorage.setItem(this._composeCacheKey(key), this.get(key));
     }
   },
-  registerPathListener: function (path, callback, group) {
+  registerPathListener: function (path, callback, group, check) {
     path = Array.isArray(path) ? path : [path];
-    this.pathListener.registerListener(path, callback, group);
+    this.pathListener.registerListener(path, callback, group, check);
   },
   removeListenerByPath: function (path, callback) {
     path = Array.isArray(path) ? path : [path];

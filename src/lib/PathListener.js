@@ -23,7 +23,9 @@ PathListener.prototype = {
       i ++;
     }
   },
-  registerListener: function (path, cb, group) {
+  registerListener: function (path, cb, group, check) {
+    group = typeof group === 'string' ? group : null;
+    check = group === null ? group !== false : check !== false;
     let i = 0, len = path.length, pathItem, treeRef = this.listenerTree, listenerIndex;
     while (i < len){
       pathItem = path[i ++];
@@ -33,13 +35,13 @@ PathListener.prototype = {
       treeRef = i === len ? treeRef[pathItem] : treeRef[pathItem].children;
     }
     listenerIndex = treeRef.listeners.push(cb) - 1;
-    if(typeof group === 'string'){
+    if(group !== null){
       if(this.groupRefs[group] === undefined){
         this.groupRefs[group] = [];
       }
       this.groupRefs[group].push([treeRef.listeners, listenerIndex]);
     }
-    if(group === true){
+    if(check){
       this.checkPath(path);
     }
   },
