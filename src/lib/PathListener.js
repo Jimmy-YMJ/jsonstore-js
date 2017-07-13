@@ -33,7 +33,8 @@ PathListener.prototype = {
       }
       treeRef = i === len ? treeRef[pathItem] : treeRef[pathItem].children;
     }
-    listenerIndex = treeRef.listeners.push(cb) - 1;
+    listenerIndex = treeRef.listeners.indexOf(cb);
+    listenerIndex = listenerIndex === -1 ? treeRef.listeners.push(cb) - 1 : listenerIndex;
     if(group !== null){
       if(this.groupRefs[group] === undefined){
         this.groupRefs[group] = [];
