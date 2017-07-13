@@ -17,8 +17,7 @@ PathListener.prototype = {
     let i = 0, len = listeners.length;
     while (i < len){
       if(listeners[i] === cb){
-        listeners.splice(i, 1);
-        break;
+        listeners[i] = null;
       }
       i ++;
     }
@@ -53,7 +52,7 @@ PathListener.prototype = {
       dataRef = dataRef[pathItem];
       if(treeRef[pathItem] !== undefined){
         treeRef[pathItem].listeners.forEach(listener => {
-          listener(this._copyData(dataRef));
+          typeof listener === 'function' && listener(this._copyData(dataRef));
         })
       }else{
         break;
@@ -84,7 +83,7 @@ PathListener.prototype = {
     let groupListeners = this.groupRefs[group];
     if(groupListeners !== undefined){
       groupListeners.forEach(pair => {
-        pair[0].splice(pair[1], 1);
+        typeof pair[0][pair[1]] === 'function' && (pair[0][pair[1]] = null);
       })
     }
   }
