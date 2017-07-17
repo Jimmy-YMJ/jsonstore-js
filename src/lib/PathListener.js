@@ -14,13 +14,9 @@ PathListener.prototype = {
     return this.copyStore ? JSON.parse(JSON.stringify(data)) : data;
   },
   _removeListener: function (listeners, cb) {
-    let i = 0, len = listeners.length;
-    while (i < len){
-      if(listeners[i] === cb){
-        listeners[i] = null;
-      }
-      i ++;
-    }
+    let index = listeners.indexOf(cb);
+    index > -1 && (listeners[index] = null);
+    return index;
   },
   registerListener: function (path, cb, group, check) {
     group = typeof group === 'string' ? group : null;
