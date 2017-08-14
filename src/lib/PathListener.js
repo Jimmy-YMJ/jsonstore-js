@@ -31,7 +31,7 @@ PathListener.prototype = {
   },
   registerListener: function (path, cb, group, callListener) {
     group = typeof group === 'string' ? group : null;
-    callListener = group === null ? group === true : callListener === true;
+    callListener = group === null ? group !== false : callListener !== false;
     let i = 0, len = path.length, pathItem, treeRef = this.listenerTree, listenerIndex;
     while (i < len){
       pathItem = path[i ++];
@@ -65,9 +65,9 @@ PathListener.prototype = {
       if(treeRef[pathItem] !== undefined){
         treeRef[pathItem].listeners.forEach(listener => {
           typeof listener === 'function' && listener(this._copyData(dataRef));
-        })
+        });
+        treeRef = treeRef[pathItem].children;
       }
-      treeRef = treeRef[pathItem].children;
     }
     let finalData = this._copyData(dataRef);
     if(path.length === 1 && this.flashKeys[path[0]]){
