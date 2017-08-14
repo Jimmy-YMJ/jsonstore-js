@@ -174,6 +174,12 @@ JSONDataStore.prototype = {
   removeAllListeners: function () {
     this.pathListener.removeAllListeners();
   },
+  registerStart: function () {
+    this.pathListener.registerStart();
+  },
+  registerEnd: function (cb) {
+    this.pathListener.registerEnd(cb);
+  },
   loadCache: function (success, error) {
     error = typeof error === 'function' ? error : emptyFunc;
     if(this.localStorage && typeof this.localStorage.multiGet === 'function'){
