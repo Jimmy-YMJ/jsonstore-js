@@ -6,6 +6,8 @@ function PathListener(options) {
   this.groupRefs = {};
   this.store = options.store || {};
   this.flashKeys = options.flashKeys || {};
+  this._recordRegisterData = false;
+  this._registerDataCollection = [];
 }
 
 PathListener.prototype = {
@@ -18,9 +20,18 @@ PathListener.prototype = {
     index > -1 && (listeners[index] = null);
     return index;
   },
-  registerListener: function (path, cb, group, check) {
+  registerStart: function () {
+    this._registerDataCollection = [];
+    this._recordRegisterData = true;
+  },
+  registerEnd: function (cb) {
+    cb(this._registerDataCollection.slice());
+    this._recordRegisterData = false;
+    this._registerDataCollection = [];
+  },
+  registerListener: function (path, cb, group, callListener) {
     group = typeof group === 'string' ? group : null;
-    check = group === null ? group !== false : check !== false;
+    callListener = group === null ? group === true : callListener === true;
     let i = 0, len = path.length, pathItem, treeRef = this.listenerTree, listenerIndex;
     while (i < len){
       pathItem = path[i ++];
@@ -37,28 +48,32 @@ PathListener.prototype = {
       }
       this.groupRefs[group].push([treeRef.listeners, listenerIndex]);
     }
-    if(check){
-      this.checkPath(path);
+    if(callListener || this._recordRegisterData){
+      this._registerDataCollection.push(this._traversePath(path, callListener));
     }
   },
   checkPath: function (path) {
+    return this._traversePath(path, true);
+  },
+  _traversePath: function (path, callListener) {
     let i = 0, len = path.length, pathItem, treeRef = this.listenerTree, dataRef = this.store;
     while (i < len){
       if(dataRef === undefined) break;
       pathItem = path[i ++];
       dataRef = dataRef[pathItem];
+      if(callListener !== true) continue;
       if(treeRef[pathItem] !== undefined){
         treeRef[pathItem].listeners.forEach(listener => {
           typeof listener === 'function' && listener(this._copyData(dataRef));
         })
-      }else{
-        break;
       }
       treeRef = treeRef[pathItem].children;
     }
+    let finalData = this._copyData(dataRef);
     if(path.length === 1 && this.flashKeys[path[0]]){
       this.store[path[0]] = null;
     }
+    return finalData;
   },
   removeAllListeners: function () {
     this.listenerTree = {};
